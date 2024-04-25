@@ -1,0 +1,9 @@
+{
+    "name":"CaptureUserInput",
+    "description":"Example Extension",
+    "icon":"mdi-cog",
+    "company":"Blue Robotics",
+    "version":"1.0.0",
+    "webpage":"https://example.com",
+    "api":""
+ }
