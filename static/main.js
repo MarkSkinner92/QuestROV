@@ -1,9 +1,7 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-socket.on('message', function(msg) {
-    var li = document.createElement('li');
-    li.innerHTML = msg;
-    document.getElementById("messages").appendChild(li);
+socket.on('serialstatus', function(msg) {
+    document.getElementById("serialstatus").innerText = "Serial status: "+msg;
 });
 
 function sendMessage() {

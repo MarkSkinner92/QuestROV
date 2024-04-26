@@ -1,4 +1,6 @@
-FROM arm32v7/python:3.12
+FROM arm32v7/python:3.9-slim-bullseye
+
+RUN apt-get update && apt-get install -y python3-zmq
 
 WORKDIR /flasksocket
 
@@ -20,13 +22,17 @@ LABEL permissions='{\
           "HostPort": ""\
         }\
       ]\
-    }\
+    },\
+    "Binds":[\
+     "/dev:/dev"\
+    ]\
   }\
 }'
+
 LABEL authors='[\
     {\
-        "name": "Willian Galvani",\
-        "email": "willian@bluerobotics.com"\
+        "name": "Mark Skinner",\
+        "email": "markhskinner@gmail.com"\
     }\
 ]'
 LABEL company='{\
@@ -43,5 +49,5 @@ LABEL links='{\
 LABEL requirements="core >= 1.1"
 
 EXPOSE 5000
-#CMD ["sh", "-c", "python3 app.py & python3 serial_com.py & tail -f /dev/null"]
-ENTRYPOINT python3 app.py
+
+CMD ["sh", "-c", "python3 app.py & python3 serial_com.py &"]
