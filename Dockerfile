@@ -1,14 +1,21 @@
-FROM arm32v7/python:3.9-slim-bullseye
-
-RUN apt-get update && apt-get install -y python3-zmq
+FROM balenalib/raspberry-pi-debian:latest
 
 WORKDIR /flasksocket
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    build-essential \
+    libzmq3-dev \
+    supervisor
 
 COPY requirements.txt requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Copy the supervisor configuration file
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 LABEL version="1.0.1"
 LABEL permissions='{\
@@ -50,4 +57,4 @@ LABEL requirements="core >= 1.1"
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "python3 app.py & python3 serial_com.py &"]
+CMD ["supervisord", "-n"]

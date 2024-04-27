@@ -12,7 +12,7 @@ Flask-SocketIO==5.3.6
 #MarkupSafe==2.1.5
 #pymavlink==2.4.41
 pyserial==3.5
-twisted==24.3.0
+pyzmq==26.0.2
 #python-engineio==4.9.0
 #python-socketio==5.11.2
 #pyzmq==19.0.2
