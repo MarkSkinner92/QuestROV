@@ -2,6 +2,7 @@ import serial
 import socketio, time
 import zmq
 import sys
+import json
 
 context = zmq.Context()
 
@@ -22,7 +23,7 @@ publisher.send_string("serial starting")
 
 # Serial port configuration
 try:
-    ser = serial.Serial('/dev/ttyACM0', 9600)
+    ser = serial.Serial('/dev/ttyACM0', 115200)
     publisher.send_string("serial active")
     print("serial connected")
 
@@ -35,7 +36,12 @@ except serial.SerialException:
 while True:
     # Receive a message
     data = subscriber.recv_string()
-    print(f"Received content '{data}'")
-    print(data)
-    ser.write('e'.encode('utf-8'))
-    ser.write(b'\n')  # Add a newline character if needed for proper termination
+    # try:
+    print(f"raw input '{data}'")
+    value = json.loads(data.split(' ',1)[1])['value']
+    # print(f"Received value '{value}'")
+    print(round(value*90 + 90))
+    ser.write(str(round(value*90 + 90)).encode())
+    ser.write(b'\n')
+    # except:
+    #     print("error")

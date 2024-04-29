@@ -35,7 +35,7 @@ function handleButtonStateChange(gamepad, buttonIndex) {
   
   if (buttonState !== previousButtonState) {
     console.log("Button", buttonIndex, "state changed:", buttonState);
-    socket.emit("btn",[buttonIndex,buttonState])
+    socket.emit("btn",[buttonIndex,buttonState?1:0])
     previousState[gamepad.index].buttons[buttonIndex] = buttonState;
   }
 }
@@ -100,7 +100,7 @@ if (checkGamepadSupport()) {
 function handleKeyDown(event) {
     var keyCode = event.keyCode;
     var keyName = event.key;
-    socket.emit('key',[keyCode,true])
+    socket.emit('key',[keyCode,1])
 
     // Display key info
     document.getElementById("key-info").innerHTML = "Key Down: " + keyName + " (KeyCode: " + keyCode + ")";
@@ -110,7 +110,7 @@ function handleKeyDown(event) {
 function handleKeyUp(event) {
     var keyCode = event.keyCode;
     var keyName = event.key;
-    socket.emit('key',[keyCode,false])
+    socket.emit('key',[keyCode,0])
 
     // Display key info
     document.getElementById("key-info").innerHTML = "Key Up: " + keyName + " (KeyCode: " + keyCode + ")";

@@ -23,6 +23,7 @@ LABEL permissions='{\
     "5000/tcp": {}\
   },\
   "HostConfig": {\
+    "Privileged": true,\
     "PortBindings": {\
       "5000/tcp": [\
         {\
@@ -31,7 +32,7 @@ LABEL permissions='{\
       ]\
     },\
     "Binds":[\
-     "/dev:/dev"\
+      "/dev:/dev"\
     ]\
   }\
 }'
