@@ -1,0 +1,3 @@
+[submodule "static/jQuery-Flight-Indicators"]
+	path = static/jQuery-Flight-Indicators
+	url = https://github.com/sebmatton/jQuery-Flight-Indicators.git
