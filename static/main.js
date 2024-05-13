@@ -1,8 +1,20 @@
-var socket = io.connect('http://' + document.domain + ':' + location.port);
+let socket = io.connect('http://' + document.domain + ':' + location.port);
 
-socket.on('serialstatus', function(msg) {
-    document.getElementById("serialstatus").innerText = "Serial status: "+msg;
+// grab a reference to our attitude widget
+let attitude = $.flightIndicator('#attitude', 'attitude', {roll:50, pitch:-20, size:150, showBox : false, img_directory : window.widgetImagePath});
+
+socket.on('imu', function(msg) {
+    data = JSON.parse(msg);
+    attitude.setPitch(data?.pitch)
+    attitude.setRoll(data?.roll)
+    console.log(data)
 });
+
+//this interval sends a ping at a realitively high frequency
+//omitting this interval, or slowing it down to even 1hz makes the socket connection chopy and unreliable.
+setInterval(() => {
+  socket.emit('ping')
+}, 1000/30)
 
 function sendMessage() {
     var message = document.getElementById('message').value;
@@ -10,7 +22,6 @@ function sendMessage() {
     document.getElementById('message').value = '';
 }
 
-// Function to check for gamepad support
 function checkGamepadSupport() {
   return 'getGamepads' in navigator;
 }

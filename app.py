@@ -14,8 +14,8 @@ publisher.bind("tcp://*:5555")
 
 # Create a ZeroMQ subscriber
 subscriber = context.socket(zmq.SUB)
-subscriber.connect("tcp://0.0.0.0:5556")
 subscriber.setsockopt_string(zmq.SUBSCRIBE, "")
+subscriber.bind("tcp://*:5556")
 
 def publishData(topic,data):
     global publisher
@@ -46,23 +46,18 @@ def handle_message(msg):
 @socketio.on('axi')
 def handle_message(msg):
     print('axis: ' + str(msg[0]) + '   ' + str(msg[1]))
-    publishData("axi",{"id":msg[0],"value":msg[1]})
+    publishData("axis",{"id":msg[0],"value":msg[1]})
 
-def subscriberThread():
+def backgroundThread():
     global socketio
-    print("Starting subscriber thread...")
     while True:
         data = subscriber.recv_string()
-        
-        if(data == 'serial active'):
-            print("welcome, serial node")
-            socketio.emit('serialstatus', 'active')
-
-        if(data == 'serial failedToConnect'):
-            print("serial failed to connect")
-            socketio.emit('serialstatus', 'failed')
+        parts = data.split("/", 1)
+        if(parts[0] == 'web'):
+            slices = parts[1].split(" ", 1)
+            print("sending webdata: topic = " + slices[0] + "; message = " + slices[1])
+            socketio.emit(slices[0], slices[1])
 
 if __name__ == '__main__':
-    subThread = threading.Thread(target=subscriberThread, daemon=True)
-    subThread.start()
+    threading.Thread(target=backgroundThread, daemon=True).start()
     socketio.run(app, allow_unsafe_werkzeug=True, host="0.0.0.0", port=5000)

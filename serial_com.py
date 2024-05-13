@@ -15,8 +15,7 @@ subscriber.setsockopt_string(zmq.SUBSCRIBE, "")
 publisher = context.socket(zmq.PUB)
 publisher.bind("tcp://*:5556")
 
-#TODO use some kind of ack system instead of a blind delay
-print("waiting for main app to acknowledge our serial node")
+print("allow time for zmq to connect")
 time.sleep(1)
 
 publisher.send_string("serial starting")
