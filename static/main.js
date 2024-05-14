@@ -16,12 +16,6 @@ setInterval(() => {
   socket.emit('ping')
 }, 1000/30)
 
-function sendMessage() {
-    var message = document.getElementById('message').value;
-    socket.emit('message', message);
-    document.getElementById('message').value = '';
-}
-
 function checkGamepadSupport() {
   return 'getGamepads' in navigator;
 }
@@ -114,7 +108,7 @@ function handleKeyDown(event) {
     socket.emit('key',[keyCode,1])
 
     // Display key info
-    document.getElementById("key-info").innerHTML = "Key Down: " + keyName + " (KeyCode: " + keyCode + ")";
+    // document.getElementById("key-info").innerHTML = "Key Down: " + keyName + " (KeyCode: " + keyCode + ")";
 }
 
 // Function to handle keyup event
@@ -124,9 +118,19 @@ function handleKeyUp(event) {
     socket.emit('key',[keyCode,0])
 
     // Display key info
-    document.getElementById("key-info").innerHTML = "Key Up: " + keyName + " (KeyCode: " + keyCode + ")";
+    // document.getElementById("key-info").innerHTML = "Key Up: " + keyName + " (KeyCode: " + keyCode + ")";
 }
 
 // Add event listeners for keydown and keyup events
 window.addEventListener("keydown", handleKeyDown);
 window.addEventListener("keyup", handleKeyUp);
+
+let telem = [
+  "Gamepad status: connected",
+  "Battery: 95%",
+  "Voltage: 12.4v",
+  "Depth: 2.5m",
+  "Gripper: open"
+];
+
+document.getElementById("telem").innerText = telem.join('\n')
