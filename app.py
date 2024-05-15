@@ -17,9 +17,13 @@ subscriber = context.socket(zmq.SUB)
 subscriber.setsockopt_string(zmq.SUBSCRIBE, "")
 subscriber.bind("tcp://*:5556")
 
-def publishData(topic,data):
+def publishJSON(topic,data):
     global publisher
     publisher.send_string(topic + " " + json.dumps(data))
+
+def publishMessage(topic,message):
+    global publisher
+    publisher.send_string(topic + " " + message)
 
 app = Flask(__name__, static_url_path="/static", static_folder="static")
 app.config['SECRET_KEY'] = 'secret!'
@@ -36,27 +40,38 @@ def register_service():
 @socketio.on('btn')
 def handle_message(msg):
     print('button: ' + str(msg[0]) + '   ' + str(msg[1]))
-    publishData("btn",{"id":msg[0],"value":msg[1]})
+    publishJSON("man/btn",{"id":msg[0],"value":msg[1]})
 
 @socketio.on('key')
 def handle_message(msg):
     print('key: ' + str(msg[0]) + '   ' + str(msg[1]))
-    publishData("key",{"id":msg[0],"value":msg[1]})
+    publishJSON("man/key",{"id":msg[0],"value":msg[1]})
+    publishMessage("serial", "1" if msg[1] == 1 else "0")
 
 @socketio.on('axi')
 def handle_message(msg):
     print('axis: ' + str(msg[0]) + '   ' + str(msg[1]))
-    publishData("axis",{"id":msg[0],"value":msg[1]})
+    publishJSON("man/axis",{"id":msg[0],"value":msg[1]})
 
 def backgroundThread():
     global socketio
     while True:
+
         data = subscriber.recv_string()
-        parts = data.split("/", 1)
-        if(parts[0] == 'web'):
-            slices = parts[1].split(" ", 1)
-            print("sending webdata: topic = " + slices[0] + "; message = " + slices[1])
-            socketio.emit(slices[0], slices[1])
+        parts = data.split(" ", 1)
+        message = parts[1]
+        path = parts[0]
+
+        splitPath = path.split('/', 1)
+        protocol = splitPath[0]
+        subPath = splitPath[1] if len(splitPath) > 1 else ""
+
+        if(protocol == 'web'):
+            print("sending webdata: topic = " + subPath + "; message = " + message)
+            socketio.emit(subPath, message)
+
+        if(protocol == 'serial'):
+            print("recieved serial data: " + message)
 
 if __name__ == '__main__':
     threading.Thread(target=backgroundThread, daemon=True).start()

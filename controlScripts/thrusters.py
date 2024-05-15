@@ -13,8 +13,8 @@ context = zmq.Context()
 # Create a ZeroMQ subscriber
 subscriber = context.socket(zmq.SUB)
 subscriber.connect("tcp://127.0.0.1:5555")
-subscriber.setsockopt_string(zmq.SUBSCRIBE, "axis")
-subscriber.setsockopt_string(zmq.SUBSCRIBE, "key")
+subscriber.setsockopt_string(zmq.SUBSCRIBE, "man/axis")
+subscriber.setsockopt_string(zmq.SUBSCRIBE, "man/key")
 
 # assume each thruster (1-6) is hooked up correctly. If not, replace that thruster with -1
 thrusterDirection = np.array([1,1,1,1,1,1])
