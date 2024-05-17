@@ -1,5 +1,75 @@
 let socket = io.connect('http://' + document.domain + ':' + location.port);
 
+/*
+
+axis : gamepad axis id (2 axis exist per joystick)
+axisMultiplier : multiplies the value of the axis given (use to change direction of axis)
+
+buttons are gamepad buttons
+  - positive returns 1
+  - negative returns -1
+  - when released, a value of 0 is returned
+
+keys are on the keyboard
+  - positive returns 1
+  - negative returns -1
+  - when released, a value of 0 is returned
+
+*/
+
+const inputMapping = {
+  "forward":{
+    axis: 1, // Left joystick vertical axis
+    axisMultiplier: -1,
+    buttonPositive: null,
+    buttonNegative: null,
+    keyPositive: 'w',
+    keyNegative: 's'
+  },
+  "rightTurn":{
+    axis: 0, // Left Joystick horizontal axis
+    axisMultiplier: 1,
+    buttonPositive: null,
+    buttonNegative: null,
+    keyPositive: 'd',
+    keyNegative: 'a'
+  },
+  "up":{
+    axis: 3, // Right joystick, vertical axis
+    axisMultiplier: -1,
+    buttonPositive: null,
+    buttonNegative: null,
+    keyPositive: 'ArrowUp',
+    keyNegative: 'ArrowDown'
+  },
+  "rightRoll":{
+    axis: 2, // Right joystick, horizontal axis
+    axisMultiplier: 1,
+    buttonPositive: null,
+    buttonNegative: null,
+    keyPositive: 'ArrowRight',
+    keyNegative: 'ArrowLeft'
+  },
+  "camera":{
+    axis: null,
+    axisMultiplier: null,
+    buttonPositive: 3, // Y button
+    buttonNegative: 0, // A button
+    keyPositive: 'e',
+    keyNegative: 'q'
+  },
+  "gripper":{
+    axis: null,
+    axisMultiplier: null,
+    buttonPositive: 5, // RB
+    buttonNegative: 4, // LB
+    keyPositive: ' ',
+    keyNegative: null
+  },
+}
+
+pressedKeys = {}
+
 // grab a reference to our attitude widget
 let attitude = $.flightIndicator('#attitude', 'attitude', {roll:50, pitch:-20, size:150, showBox : false, img_directory : window.widgetImagePath});
 
@@ -7,7 +77,6 @@ socket.on('imu', function(msg) {
     data = JSON.parse(msg);
     attitude.setPitch(data?.pitch)
     attitude.setRoll(data?.roll)
-    console.log(data)
 });
 
 //this interval sends a ping at a realitively high frequency
@@ -15,6 +84,10 @@ socket.on('imu', function(msg) {
 setInterval(() => {
   socket.emit('ping')
 }, 1000/30)
+
+function sendControl(name,value){
+  socket.emit("man",name,value);
+}
 
 function checkGamepadSupport() {
   return 'getGamepads' in navigator;
@@ -39,9 +112,17 @@ function handleButtonStateChange(gamepad, buttonIndex) {
   var previousButtonState = previousState[gamepad.index].buttons[buttonIndex];
   
   if (buttonState !== previousButtonState) {
-    console.log("Button", buttonIndex, "state changed:", buttonState);
-    socket.emit("btn",[buttonIndex,buttonState?1:0])
     previousState[gamepad.index].buttons[buttonIndex] = buttonState;
+
+    for (let mapcode in inputMapping) {
+      if(inputMapping[mapcode].buttonPositive == buttonIndex){
+        sendControl(mapcode, buttonState?1:0)
+        // console.log(mapcode, buttonState?1:0)
+      }else if(inputMapping[mapcode].buttonNegative == buttonIndex){
+        sendControl(mapcode, (buttonState?1:0) * -1)
+        // console.log(mapcode, (buttonState?1:0) * -1)
+      }
+    }
   }
 }
 
@@ -51,9 +132,14 @@ function handleAxisStateChange(gamepad, axisIndex) {
   var previousAxisValue = previousState[gamepad.index].axes[axisIndex];
   
   if (axisValue !== previousAxisValue) {
-    console.log("Axis", axisIndex, "value changed:", axisValue);
-    socket.emit("axi",[axisIndex,axisValue])
     previousState[gamepad.index].axes[axisIndex] = axisValue;
+
+    for (let mapcode in inputMapping) {
+      if(inputMapping[mapcode].axis == axisIndex){
+        sendControl(mapcode, axisValue * inputMapping[mapcode].axisMultiplier)
+        // console.log(mapcode, axisValue * inputMapping[mapcode].axisMultiplier)
+      }
+    }
   }
 }
 
@@ -103,9 +189,20 @@ if (checkGamepadSupport()) {
 
 // Function to handle keydown event
 function handleKeyDown(event) {
-    var keyCode = event.keyCode;
-    var keyName = event.key;
-    socket.emit('key',[keyCode,1])
+
+  if(!pressedKeys[event.key]){
+    pressedKeys[event.key] = true;
+
+    for (let mapcode in inputMapping) {
+      if(inputMapping[mapcode].keyPositive == event.key){
+        sendControl(mapcode, 1)
+        // console.log(mapcode, 1)
+      }else if(inputMapping[mapcode].keyNegative == event.key){
+        sendControl(mapcode, -1)
+        // console.log(mapcode, -1)
+      }
+    }
+  }
 
     // Display key info
     // document.getElementById("key-info").innerHTML = "Key Down: " + keyName + " (KeyCode: " + keyCode + ")";
@@ -113,9 +210,13 @@ function handleKeyDown(event) {
 
 // Function to handle keyup event
 function handleKeyUp(event) {
-    var keyCode = event.keyCode;
-    var keyName = event.key;
-    socket.emit('key',[keyCode,0])
+  pressedKeys[event.key] = false;
+  for (let mapcode in inputMapping) {
+    if(inputMapping[mapcode].keyPositive == event.key || inputMapping[mapcode].keyNegative == event.key){
+      sendControl(mapcode, 0)
+      // console.log(mapcode, 0)
+    }
+  }
 
     // Display key info
     // document.getElementById("key-info").innerHTML = "Key Up: " + keyName + " (KeyCode: " + keyCode + ")";

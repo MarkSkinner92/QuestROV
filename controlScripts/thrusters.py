@@ -13,8 +13,7 @@ context = zmq.Context()
 # Create a ZeroMQ subscriber
 subscriber = context.socket(zmq.SUB)
 subscriber.connect("tcp://127.0.0.1:5555")
-subscriber.setsockopt_string(zmq.SUBSCRIBE, "man/axis")
-subscriber.setsockopt_string(zmq.SUBSCRIBE, "man/key")
+subscriber.setsockopt_string(zmq.SUBSCRIBE, "man/")
 
 # assume each thruster (1-6) is hooked up correctly. If not, replace that thruster with -1
 thrusterDirection = np.array([1,1,1,1,1,1])
@@ -48,15 +47,19 @@ inputVector = np.matrix([[0.0],[0.0],[0.0]])
 
 while True:
     stringData = subscriber.recv_string()
-    data = json.loads(stringData.split(' ',1)[1])
 
-    if(data['id'] == 1):
-        inputVector[0,0] = -deadZone(data['value'], radius)
+    print(stringData)
+    data = stringData.split(' ',1)
+    message = data[0]
+    value = float(data[1])
 
-    if(data['id'] == 0):
-        inputVector[1,0] = deadZone(data['value'], radius)
+    if(message == 'man/forward'):
+        inputVector[0,0] = deadZone(value, radius)
 
-    if(data['id'] == 3):
-        inputVector[2,0] = -deadZone(data['value'], radius)
+    if(message == 'man/rightTurn'):
+        inputVector[1,0] = deadZone(value, radius)
+
+    if(message == 'man/up'):
+        inputVector[2,0] = deadZone(value, radius)
 
     print(computeThrustVector(inputVector))

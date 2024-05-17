@@ -17,9 +17,9 @@ subscriber = context.socket(zmq.SUB)
 subscriber.setsockopt_string(zmq.SUBSCRIBE, "")
 subscriber.bind("tcp://*:5556")
 
-def publishJSON(topic,data):
-    global publisher
-    publisher.send_string(topic + " " + json.dumps(data))
+# def publishJSON(topic,data):
+#     global publisher
+#     publisher.send_string(topic + " " + json.dumps(data))
 
 def publishMessage(topic,message):
     global publisher
@@ -37,21 +37,10 @@ def index():
 def register_service():
    return app.send_static_file("register_service.json")
 
-@socketio.on('btn')
-def handle_message(msg):
-    print('button: ' + str(msg[0]) + '   ' + str(msg[1]))
-    publishJSON("man/btn",{"id":msg[0],"value":msg[1]})
-
-@socketio.on('key')
-def handle_message(msg):
-    print('key: ' + str(msg[0]) + '   ' + str(msg[1]))
-    publishJSON("man/key",{"id":msg[0],"value":msg[1]})
-    publishMessage("serial", "1" if msg[1] == 1 else "0")
-
-@socketio.on('axi')
-def handle_message(msg):
-    print('axis: ' + str(msg[0]) + '   ' + str(msg[1]))
-    publishJSON("man/axis",{"id":msg[0],"value":msg[1]})
+@socketio.on('man')
+def handle_message(name, value):
+    publishMessage("man/"+name,str(value))
+    print(name, value)
 
 def backgroundThread():
     global socketio
