@@ -2,6 +2,9 @@ let socket = io.connect('http://' + document.domain + ':' + location.port);
 
 /*
 
+This is the default input mapping responsible for taking key, button, and axis inputs and mapping them to certain ROV actions.
+At runtime, it is replaced with the contents of inputMapping.json if that file is found.
+
 axis : gamepad axis id (2 axis exist per joystick)
 axisMultiplier : multiplies the value of the axis given (use to change direction of axis)
 
@@ -17,7 +20,7 @@ keys are on the keyboard
 
 */
 
-const inputMapping = {
+let inputMapping = {
   "forward":{
     axis: 1, // Left joystick vertical axis
     axisMultiplier: -1,
@@ -67,6 +70,13 @@ const inputMapping = {
     keyNegative: null
   },
 }
+
+// Try to update the key input mapping dictionary with the json file, otherwise, just fall back on the default.
+$.getJSON('inputMapping', function(data) {
+  console.log("Loaded new input mapping:")
+  console.log(data);
+  inputMapping = data;
+});
 
 pressedKeys = {}
 

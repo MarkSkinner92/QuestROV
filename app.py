@@ -37,6 +37,10 @@ def index():
 def register_service():
    return app.send_static_file("register_service.json")
 
+@app.route("/inputMapping")
+def inputMapping():
+   return app.send_static_file("inputMapping.json")
+
 @socketio.on('man')
 def handle_message(name, value):
     publishMessage("man/"+name,str(value))
