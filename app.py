@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
 import zmq
@@ -33,9 +33,25 @@ socketio = SocketIO(app)
 def index():
     return render_template('index.html')
 
+@app.route('/config')
+def config():
+    return render_template('config.html')
+
 @app.route("/register_service")
 def register_service():
    return app.send_static_file("register_service.json")
+
+@app.route("/config_data",methods=['GET'])
+def get_config():
+   return app.send_static_file("config.json")
+
+@app.route('/config_data',methods=['POST'])            
+def save_config():                                           
+    if request.is_json:
+        data = request.json
+        with open("static/config.json", 'w') as file:
+            json.dump(data, file, indent=4)
+    return 'success'
 
 @app.route("/inputMapping")
 def inputMapping():

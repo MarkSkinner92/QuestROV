@@ -1,0 +1,12 @@
+{
+    "thrusters": {
+        "thrusterDirections": [
+            100,
+            1,
+            1,
+            1,
+            -1,
+            1
+        ]
+    }
+}

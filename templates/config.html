@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <!-- when using the mode "code", it's important to specify charset utf-8 -->
+    <meta charset="utf-8">
+
+    <!-- TODO: replace with local files in submodule for offline use -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/10.0.3/jsoneditor.min.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/10.0.3/jsoneditor.min.js"></script>
+</head>
+<body>
+    <div id="toolbar" style="padding:10px">
+        <p style="display:inline">Config page for "<span id="ROVname">pending...</span>"</p>
+        <button onclick="pullConfigSettingsFromROV()">Pull from ROV</button>
+        <button onclick="uploadConfigSettings()">Save to ROV</button>
+        <p style="display:inline">Status: <span id="statusText">Pulled config settings from ROV</span></p>
+    </div>
+
+    <div id="jsoneditor" style="width: 100%; height: 80%;"></div>
+
+    <script>
+        // create the editor
+        const container = document.getElementById("jsoneditor")
+        const options = {}
+        const editor = new JSONEditor(container, options)
+        getROVname();
+        pullConfigSettingsFromROV();
+
+        function pullConfigSettingsFromROV(){
+            // Get config JSON and load it into the editor
+            const req = new XMLHttpRequest();
+
+            req.onload = (e) => {
+                try{
+                    let jsonInEditor = req.response;
+                    console.log("got this: ", jsonInEditor);
+                    console.log("If the above is not proper JSON, that will be an issue")
+                    editor.set(jsonInEditor);
+                    setStatusText("Done loading config.json")
+                }catch{
+                    setStatusText("Error parsing config.json. See console for details")
+                }
+            /* … */
+            };
+            req.open("GET", "/config_data");
+            req.responseType = "json";
+            req.send();
+            setStatusText("Pulling config.json from ROV...")
+        }
+
+        function uploadConfigSettings(){
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("POST", "/config_data", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            var jsonData = editor.get();
+
+            var jsonString = JSON.stringify(jsonData);
+            console.log(jsonString);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        setStatusText("Successfully updated config.json")
+                    } else {
+                        setStatusText("Request failed with status: " + xhr.status);
+                    }
+                }
+            };
+
+            xhr.send(jsonString);
+        }
+
+        function setStatusText(text){
+            document.getElementById("statusText").innerText = text;
+        }
+
+        function getROVname(){
+            const req = new XMLHttpRequest();
+
+            req.onload = (e) => {
+                try{
+                    let response = req.response;
+                    document.getElementById("ROVname").innerText = response;
+                    console.log(response);
+                }catch{
+                    document.getElementById("ROVname").innerText = "Couldn't get name";
+                }
+            /* … */
+            };
+
+            hostname = window.location.hostname;
+            req.open("GET", `http://${hostname}:9111/v1.0/vehicle_name`);
+            req.responseType = "json";
+            req.send(); 
+
+            req.onerror = function() {
+                console.error("Error getting ROV name:", req.statusText);
+                document.getElementById("ROVname").innerText = `BlueOS not accessible via ${hostname}`;
+            };
+            
+        }
+
+    </script>
+</body>
+</html>
