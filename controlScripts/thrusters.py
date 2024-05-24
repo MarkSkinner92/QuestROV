@@ -15,7 +15,7 @@ subscriber = context.socket(zmq.SUB)
 subscriber.connect("tcp://127.0.0.1:5555")
 subscriber.setsockopt_string(zmq.SUBSCRIBE, "man/")
 
-# assume each thruster (1-6) is hooked up correctly. If not, replace that thruster with -1
+# To change the direction of a particular thruster, change this number
 thrusterDirection = np.array([1,1,1,1,1,1])
 
 # 6x3 transformation matrix
