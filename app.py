@@ -29,11 +29,11 @@ app = Flask(__name__, static_url_path="/static", static_folder="static")
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
-@app.route('/')
+@app.route('/console')
 def index():
     return render_template('index.html')
 
-@app.route('/config')
+@app.route('/')
 def config():
     return render_template('config.html')
 

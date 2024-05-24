@@ -1,9 +1,9 @@
 {
     "name":"CaptureUserInput",
-    "description":"Example Extension",
+    "description":"Drives a non-ardupilot sub",
     "icon":"mdi-clock-fast",
-    "company":"Blue Robotics",
+    "company":"Quest",
     "version":"1.0.0",
-    "webpage":"https://example.com",
+    "webpage":"none",
     "api":""
  }

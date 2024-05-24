@@ -10,7 +10,6 @@
 </head>
 <body>
     <div id="toolbar" style="padding:10px">
-        <p style="display:inline">Config page for "<span id="ROVname">pending...</span>"</p>
         <button onclick="pullDefaultConfig()">Pull Factory Default</button>
         <button onclick="pullConfigSettingsFromROV()">Pull from ROV</button>
         <button onclick="uploadConfigSettings()">Save to ROV</button>
@@ -24,7 +23,6 @@
         const container = document.getElementById("jsoneditor")
         const options = {}
         const editor = new JSONEditor(container, options)
-        getROVname();
         pullConfigSettingsFromROV();
 
         function pullConfigSettingsFromROV(){
@@ -75,32 +73,6 @@
 
         function setStatusText(text){
             document.getElementById("statusText").innerText = text;
-        }
-
-        function getROVname(){
-            const req = new XMLHttpRequest();
-
-            req.onload = (e) => {
-                try{
-                    let response = req.response;
-                    document.getElementById("ROVname").innerText = response;
-                    console.log(response);
-                }catch{
-                    document.getElementById("ROVname").innerText = "Couldn't get name";
-                }
-            /* … */
-            };
-
-            hostname = window.location.hostname;
-            req.open("GET", `http://${hostname}:9111/v1.0/vehicle_name`);
-            req.responseType = "json";
-            req.send(); 
-
-            req.onerror = function() {
-                console.error("Error getting ROV name:", req.statusText);
-                document.getElementById("ROVname").innerText = `BlueOS not accessible via ${hostname}`;
-            };
-            
         }
 
         function pullDefaultConfig(){
