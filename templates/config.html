@@ -11,6 +11,7 @@
 <body>
     <div id="toolbar" style="padding:10px">
         <p style="display:inline">Config page for "<span id="ROVname">pending...</span>"</p>
+        <button onclick="pullDefaultConfig()">Pull Factory Default</button>
         <button onclick="pullConfigSettingsFromROV()">Pull from ROV</button>
         <button onclick="uploadConfigSettings()">Save to ROV</button>
         <p style="display:inline">Status: <span id="statusText">Pulled config settings from ROV</span></p>
@@ -100,6 +101,27 @@
                 document.getElementById("ROVname").innerText = `BlueOS not accessible via ${hostname}`;
             };
             
+        }
+
+        function pullDefaultConfig(){
+            const req = new XMLHttpRequest();
+
+            req.onload = (e) => {
+                try{
+                    let jsonInEditor = req.response;
+                    console.log("got this: ", jsonInEditor);
+                    console.log("If the above is not proper JSON, that will be an issue")
+                    editor.set(jsonInEditor);
+                    setStatusText("Done loading defaultConfig.json")
+                }catch{
+                    setStatusText("Error parsing defaultConfig.json. See console for details")
+                }
+            /* … */
+            };
+            req.open("GET", "/default_config_data");
+            req.responseType = "json";
+            req.send();
+            setStatusText("Pulling defaultConfig.json from ROV...")
         }
 
     </script>

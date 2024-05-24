@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 from flask_socketio import SocketIO, emit
 
 import zmq
@@ -43,13 +43,17 @@ def register_service():
 
 @app.route("/config_data",methods=['GET'])
 def get_config():
-   return app.send_static_file("config.json")
+   return send_from_directory("configuration/", "config.json")
+
+@app.route("/default_config_data",methods=['GET'])
+def get_default_config():
+   return send_from_directory("configuration/", "defaultConfig.json")
 
 @app.route('/config_data',methods=['POST'])            
 def save_config():                                           
     if request.is_json:
         data = request.json
-        with open("static/config.json", 'w') as file:
+        with open("configuration/config.json", 'w') as file:
             json.dump(data, file, indent=4)
     return 'success'
 
