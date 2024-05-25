@@ -1,3 +1,55 @@
 {
-    "text": "Here is a default configuration file"
+    "thrusters":{
+        "directions" : [1,1,1,1,1,1]
+    },
+    "inputMapping":{
+        "forward": {
+          "axis": 1,
+          "axisMultiplier": -1,
+          "buttonPositive": null,
+          "buttonNegative": null,
+          "keyPositive": "w",
+          "keyNegative": "s"
+        },
+        "rightTurn": {
+          "axis": 0,
+          "axisMultiplier": 1,
+          "buttonPositive": null,
+          "buttonNegative": null,
+          "keyPositive": "d",
+          "keyNegative": "a"
+        },
+        "up": {
+          "axis": 3,
+          "axisMultiplier": -1,
+          "buttonPositive": null,
+          "buttonNegative": null,
+          "keyPositive": "ArrowUp",
+          "keyNegative": "ArrowDown"
+        },
+        "rightRoll": {
+          "axis": 2,
+          "axisMultiplier": 1,
+          "buttonPositive": null,
+          "buttonNegative": null,
+          "keyPositive": "ArrowRight",
+          "keyNegative": "ArrowLeft"
+        },
+        "camera": {
+          "axis": null,
+          "axisMultiplier": null,
+          "buttonPositive": 3,
+          "buttonNegative": 0,
+          "keyPositive": "e",
+          "keyNegative": "q"
+        },
+        "gripper": {
+          "axis": null,
+          "axisMultiplier": null,
+          "buttonPositive": 5,
+          "buttonNegative": 4,
+          "keyPositive": " ",
+          "keyNegative": null
+        }
+    }
 }

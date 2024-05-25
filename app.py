@@ -57,10 +57,6 @@ def save_config():
             json.dump(data, file, indent=4)
     return 'success'
 
-@app.route("/inputMapping")
-def inputMapping():
-   return app.send_static_file("inputMapping.json")
-
 @socketio.on('man')
 def handle_message(name, value):
     publishMessage("man/"+name,str(value))
