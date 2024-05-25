@@ -81,13 +81,15 @@ $.getJSON('config_data', function(data) {
 
 pressedKeys = {}
 
-// grab a reference to our attitude widget
+// grab a reference to our attitude and heading widgets
 let attitude = $.flightIndicator('#attitude', 'attitude', {roll:50, pitch:-20, size:150, showBox : false, img_directory : window.widgetImagePath});
+let heading = $.flightIndicator('#heading', 'heading', {size:100, showBox : false, img_directory : window.widgetImagePath});
 
 socket.on('imu', function(msg) {
     data = JSON.parse(msg);
     attitude.setPitch(data?.pitch)
     attitude.setRoll(data?.roll)
+    if(data?.heading) heading.setHeading(data.heading)
 });
 
 //this interval sends a ping at a realitively high frequency

@@ -4,6 +4,12 @@
     right: 0px;
 }
 
+#heading{
+    position: absolute;
+    top: 100px;
+    right: 0px;
+}
+
 #telem{
     font-family: sans-serif;
     position: absolute;
