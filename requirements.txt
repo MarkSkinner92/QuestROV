@@ -19,4 +19,4 @@ pyzmq==26.0.2
 #simple-websocket==1.0.0
 #Werkzeug==3.0.2
 #wsproto==1.2.0
-numpy==1.26.4s
+numpy==1.19.5

@@ -23,10 +23,10 @@ run each python script individualy, or run `supervisord -n`  to start them all (
 **Build & run locally with Docker**
 `docker build . -t testflask`
 `docker run -p 5000:5000 --privileged testflask`
+`docker run -p 5000:5000 --privileged -v /usr/blueos/extensions/QuestROV:/QuestROV/configuration testflask`
 
 **Build to Docker Hub**
 `docker build . -t markskinner92/testflask:latest --output type=registry` Replace destination with your own.
-
 
 ------------
 
@@ -47,7 +47,8 @@ run each python script individualy, or run `supervisord -n`  to start them all (
       ]
     },
     "Binds": [
-      "/dev:/dev"
+      "/dev:/dev",
+      "/usr/blueos/extensions/QuestROV:/configuration"
     ]
   }
 }

@@ -1,6 +1,6 @@
 FROM balenalib/raspberry-pi-debian:latest
 
-WORKDIR /flasksocket
+WORKDIR /QuestROV
 
 RUN apt-get update && apt-get install -y \
     python3 \
@@ -32,7 +32,8 @@ LABEL permissions='{\
       ]\
     },\
     "Binds":[\
-      "/dev:/dev"\
+      "/dev:/dev",\
+      "/usr/blueos/extensions/QuestROV:/configuration"\
     ]\
   }\
 }'

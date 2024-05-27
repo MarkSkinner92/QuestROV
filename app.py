@@ -5,6 +5,10 @@ import zmq
 import time
 import json
 import threading
+import configManager
+
+# Before anything, we need to check the contents of configuration and make sure a config file exists. If it doesn't, copy the default
+configManager.initConfigJSON()
 
 context = zmq.Context()
 
@@ -47,7 +51,7 @@ def get_config():
 
 @app.route("/default_config_data",methods=['GET'])
 def get_default_config():
-   return send_from_directory("configuration/", "defaultConfig.json")
+   return send_from_directory("defaultConfiguration/", "defaultConfig.json")
 
 @app.route('/config_data',methods=['POST'])            
 def save_config():                                           
