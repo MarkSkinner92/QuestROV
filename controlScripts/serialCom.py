@@ -21,11 +21,15 @@ publisher.connect("tcp://127.0.0.1:5556")
 print("allow time for zmq to connect")
 time.sleep(1)
 
+# Get config settings
+configSettings = {}
+with open("configuration/config.json", "r") as configData:
+    # Load the JSON data
+    configSettings = json.load(configData)
+
 # Serial port configuration
 try:
-    ser = serial.Serial('/dev/ttyACM0', 115200) # typical PI port
-
-    # ser = serial.Serial('COM6', 115200) # for development on windows
+    ser = serial.Serial(configSettings.get('serialPort', '/dev/ttyACM0'), 115200) #/dev/ttyACM0 is the default, if config doesn't have it
 
     publisher.send_string("serial active")
     print("serial/out connected")

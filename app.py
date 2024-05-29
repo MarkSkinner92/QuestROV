@@ -61,6 +61,10 @@ def save_config():
             json.dump(data, file, indent=4)
     return 'success'
 
+# @app.route("/info",methods=['GET'])
+# def getInfo():
+#    return {"battery":"12.5v"}
+
 @socketio.on('man')
 def handle_message(name, value):
     publishMessage("man/"+name,str(value))

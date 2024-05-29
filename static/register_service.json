@@ -1,5 +1,5 @@
 {
-    "name":"CaptureUserInput",
+    "name":"QuestROV",
     "description":"Drives a non-ardupilot sub",
     "icon":"mdi-clock-fast",
     "company":"Quest",

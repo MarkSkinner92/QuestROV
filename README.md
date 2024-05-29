@@ -23,7 +23,8 @@ run each python script individualy, or run `supervisord -n`  to start them all (
 **Build & run locally with Docker**
 `docker build . -t testflask`
 `docker run -p 5000:5000 --privileged testflask`
-`docker run -p 5000:5000 --privileged -v /usr/blueos/extensions/QuestROV:/QuestROV/configuration testflask`
+`docker run -p 5000:5000 --privileged -v git  testflask`
+`docker system prune` Deletes stopped/unused containers, frees up significant disk space
 
 **Build to Docker Hub**
 `docker build . -t markskinner92/testflask:latest --output type=registry` Replace destination with your own.
@@ -42,13 +43,13 @@ run each python script individualy, or run `supervisord -n`  to start them all (
     "PortBindings": {
       "5000/tcp": [
         {
-          "HostPort": ""
+          "HostPort": "5000"
         }
       ]
     },
     "Binds": [
       "/dev:/dev",
-      "/usr/blueos/extensions/QuestROV:/configuration"
+      "/usr/blueos/extensions/QuestROV:/QuestROV/configuration"
     ]
   }
 }
