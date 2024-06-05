@@ -27,16 +27,24 @@ run each python script individualy, or run `supervisord -n`  to start them all (
 `docker system prune` Deletes stopped/unused containers, frees up significant disk space
 
 **Build to Docker Hub**
-`docker build . -t markskinner92/testflask:latest --output type=registry` Replace destination with your own.
+`docker build . -t markskinner92/QuestROV:latest --output type=registry` Replace destination with your own.
 
 ------------
 
 
 **User Custom Settings -- For BlueOS Extension Manager**
+
+Extension Identifier: Quest.QuestROV
+Extension Name: QuestROV
+Docker Image: markskinner92/questrov
+Docker tag: latest
+
+Put this in User Custom Settings:
 ```
 {
   "ExposedPorts": {
-    "5000/tcp": {}
+    "5000/tcp": {},
+    "9001/tcp": {}
   },
   "HostConfig": {
     "Privileged": true,
@@ -44,6 +52,11 @@ run each python script individualy, or run `supervisord -n`  to start them all (
       "5000/tcp": [
         {
           "HostPort": "5000"
+        }
+      ],
+      "9001/tcp": [
+        {
+          "HostPort": "9001"
         }
       ]
     },
