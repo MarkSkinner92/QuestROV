@@ -55,8 +55,6 @@ while True:
     # Maybe there's a ZMQ message to send to serial?
     data = subscriber.recv_string()
 
-    # OK. It didn't throw an error, so we'll use the data we got
-
     print(f"Received value '{data}'")
     ser.write(data.encode())
     ser.write(b'\n')
