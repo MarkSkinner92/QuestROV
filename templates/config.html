@@ -14,6 +14,7 @@
         <button onclick="pullConfigSettingsFromROV()">Pull from ROV</button>
         <button onclick="uploadConfigSettings()">Save to ROV</button>
         <p style="display:inline">Status: <span id="statusText">Pulled config settings from ROV</span></p>
+        <p id="gamepadInfo" style="display: inline; float: right; margin: 0px;">Plug in a gamepad to see axis and button IDs here</p>
     </div>
 
     <div id="jsoneditor" style="width: 100%; height: 80%;"></div>
@@ -101,6 +102,42 @@
             req.send();
             setStatusText("Pulling defaultConfig.json from ROV...")
         }
+
+
+        //Gamepad info
+
+        function checkGamepadState() {
+            var gamepad = navigator.getGamepads()[0];
+            console.log(gamepad);
+            if (gamepad) {
+                if(!gamepad?.buttonsState) gamepad.buttonsState = new Array(gamepad.buttons.length).fill(false);
+                if(!gamepad?.axesState) gamepad.axesState = new Array(gamepad.axes.length).fill(0);
+
+                for (var j = 0; j < gamepad.buttons.length; j++) {
+                    if (gamepad.buttons[j].pressed !== gamepad.buttonsState[j]) {
+                        document.getElementById('gamepadInfo').innerText = ("Button " + j);
+                        gamepad.buttonsState[j] = gamepad.buttons[j].pressed;
+                    }
+                }
+
+                for (var j = 0; j < gamepad.axes.length; j++) {
+                    if (Math.abs(gamepad.axes[j] - gamepad.axesState[j]) > 0.1) {
+                        document.getElementById('gamepadInfo').innerText = ("axes " + j + " " + (gamepad.axes[j] > 0 ? "+" : "-"));
+                        gamepad.axesState[j] = gamepad.axes[j];
+                    }
+                }
+            }
+        }
+
+        // Initialize the gamepad state
+        window.addEventListener("gamepadconnected", function(e) {
+            window.gamepadInterval = setInterval(checkGamepadState, 100);
+        });
+
+        window.addEventListener("gamepaddisconnected", function(e) {
+            clearInterval(window.gamepadInterval);
+        });
+
 
     </script>
 </body>
