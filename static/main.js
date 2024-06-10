@@ -19,56 +19,7 @@ keys are on the keyboard
 
 */
 
-let inputMapping = {
-  "forward":{
-    axis: 1, // Left joystick vertical axis
-    axisMultiplier: -1,
-    buttonPositive: null,
-    buttonNegative: null,
-    keyPositive: 'w',
-    keyNegative: 's'
-  },
-  "rightTurn":{
-    axis: 0, // Left Joystick horizontal axis
-    axisMultiplier: 1,
-    buttonPositive: null,
-    buttonNegative: null,
-    keyPositive: 'd',
-    keyNegative: 'a'
-  },
-  "up":{
-    axis: 3, // Right joystick, vertical axis
-    axisMultiplier: -1,
-    buttonPositive: null,
-    buttonNegative: null,
-    keyPositive: 'ArrowUp',
-    keyNegative: 'ArrowDown'
-  },
-  "rightRoll":{
-    axis: 2, // Right joystick, horizontal axis
-    axisMultiplier: 1,
-    buttonPositive: null,
-    buttonNegative: null,
-    keyPositive: 'ArrowRight',
-    keyNegative: 'ArrowLeft'
-  },
-  "camera":{
-    axis: null,
-    axisMultiplier: null,
-    buttonPositive: 3, // Y button
-    buttonNegative: 0, // A button
-    keyPositive: 'e',
-    keyNegative: 'q'
-  },
-  "gripper":{
-    axis: null,
-    axisMultiplier: null,
-    buttonPositive: 5, // RB
-    buttonNegative: 4, // LB
-    keyPositive: ' ',
-    keyNegative: null
-  },
-}
+let inputMapping = {};
 
 // Try to update the key input mapping dictionary with the json file, otherwise, just fall back on the default.
 $.getJSON('config_data', function(data) {
@@ -87,8 +38,8 @@ let heading = $.flightIndicator('#heading', 'heading', {size:100, showBox : fals
 
 socket.on('imu', function(msg) {
     data = JSON.parse(msg);
-    attitude.setPitch(data?.pitch)
-    attitude.setRoll(data?.roll)
+    if(data?.pitch) attitude.setPitch(data.pitch)
+    if(data?.roll) attitude.setRoll(data.roll)
     if(data?.heading) heading.setHeading(data.heading)
 });
 
@@ -239,12 +190,20 @@ function handleKeyUp(event) {
 window.addEventListener("keydown", handleKeyDown);
 window.addEventListener("keyup", handleKeyUp);
 
-let telem = [
-  "Gamepad status: connected",
-  "Battery: 95%",
-  "Voltage: 12.4v",
-  "Depth: 2.5m",
-  "Gripper: open"
-];
 
-document.getElementById("telem").innerText = telem.join('\n')
+// TELEM
+let telem = [];
+
+registerTelem('voltage', "Voltage");
+
+function registerTelem(socketEventName, displayName){
+  let myIndex = telem.length;
+  socket.on(socketEventName, function(msg) {
+    telem[myIndex] = `${displayName}: ${msg}`;
+    refreshTelem();
+  })
+}
+
+function refreshTelem(){
+  document.getElementById("telem").innerText = telem.join('\n');
+}
