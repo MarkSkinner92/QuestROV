@@ -7,9 +7,9 @@ The purpose of this extension is to drive a custom non-ardupilot ROV using BlueO
 
 Most information about the file structure can be found in the BlueOS extension docs.
 
-Here, app.py runs a simple Flask server, which hosts a webpage on port 5000. This webpage is used as the source of an iFrame widget in Cockpit. It has a persistant websocket connection for teleoperation. 
+app.py runs a simple Flask server, which hosts a webpage on port 5000. This webpage found at /console is used as the source of an iFrame widget in Cockpit. It has a persistant websocket connection for teleoperation. 
 
-app.py is also connected via ZeroMQ to several other python scripts inside the controlScripts directory (see controlScripts/README in  for how that works). This allows modularity, enabliling clean and reliable communication with the serial port, and various I2C busses.
+app.py is also connected via ZeroMQ to several other python scripts inside the controlScripts directory (see controlScripts/README in  for how that works). This allows modularity, providing clean and reliable communication with the serial port, and various I2C busses.
 
 The python programs are started by a supervisord call, which is the entrypoint of the docker container.
 
