@@ -48,7 +48,6 @@ inputVector = np.matrix([[0.0],[0.0],[0.0]])
 while True:
     stringData = subscriber.recv_string()
 
-    print(stringData)
     data = stringData.split(' ',1)
     message = data[0]
     value = float(data[1])
@@ -56,10 +55,13 @@ while True:
     if(message == 'man/forward'):
         inputVector[0,0] = deadZone(value, radius)
 
-    if(message == 'man/rightTurn'):
+    elif(message == 'man/rightTurn'):
         inputVector[1,0] = deadZone(value, radius)
 
-    if(message == 'man/up'):
+    elif(message == 'man/up'):
         inputVector[2,0] = deadZone(value, radius)
 
-    print(computeThrustVector(inputVector))
+    else:
+        print(stringData)
+
+    print(message, value, " ===== " , computeThrustVector(inputVector))

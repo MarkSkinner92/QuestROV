@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     build-essential \
     libzmq3-dev \
-    supervisor
+    supervisor \
+    libatlas-base-dev
 
 COPY requirements.txt requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
