@@ -1,4 +1,4 @@
-## Custom ROV Extension for BlueOS
+## A Custom ROV Extension for BlueOS
 The purpose of this extension is to drive a custom non-ardupilot ROV using BlueOS.
 
 ------------
@@ -67,3 +67,4 @@ Put this in User Custom Settings:
   }
 }
 ```
+
