@@ -17,7 +17,8 @@ counter = 0
 while True:
     data = {
         "pitch" : 20*math.sin(counter/10),
-        "roll" : 50*math.sin(counter/10)
+        "roll" : 50*math.sin(counter/10),
+        "heading" : 55
     }
     sendJSON("web/imu",data)
     counter += 1

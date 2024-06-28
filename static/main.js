@@ -194,12 +194,13 @@ window.addEventListener("keyup", handleKeyUp);
 // TELEM
 let telem = [];
 
-registerTelem('voltage', "Voltage");
+registerTelem('telem');
 
-function registerTelem(socketEventName, displayName){
+
+function registerTelem(socketEventName){
   let myIndex = telem.length;
   socket.on(socketEventName, function(msg) {
-    telem[myIndex] = `${displayName}: ${msg}`;
+    telem[myIndex] = `${msg}`;
     refreshTelem();
   })
 }

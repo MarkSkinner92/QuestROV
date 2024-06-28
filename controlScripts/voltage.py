@@ -14,7 +14,8 @@ def sendString(topic,data):
 
 counter = 0
 while True:
-    sendString("web/voltage",counter)
+    sendString("web/telem",counter)
+   
     print("sent voltage")
     counter += 1
     time.sleep(1)

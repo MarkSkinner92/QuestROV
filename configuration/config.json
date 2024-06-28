@@ -51,11 +51,19 @@
             "keyPositive": "e",
             "keyNegative": "q"
         },
-        "gripper": {
+        "gripperOpen": {
             "axis": null,
             "axisMultiplier": null,
-            "buttonPositive": 7,
-            "buttonNegative": 6,
+            "buttonPositive": 5,
+            "buttonNegative": 4,
+            "keyPositive": " ",
+            "keyNegative": null
+        },
+        "gripperRoll": {
+            "axis": null,
+            "axisMultiplier": null,
+            "buttonPositive": 5,
+            "buttonNegative": 4,
             "keyPositive": " ",
             "keyNegative": null
         }
