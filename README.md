@@ -48,6 +48,7 @@ Put this in User Custom Settings:
   },
   "HostConfig": {
     "Privileged": true,
+    "ExtraHosts": ["host.docker.internal:host-gateway"],
     "PortBindings": {
       "5000/tcp": [
         {

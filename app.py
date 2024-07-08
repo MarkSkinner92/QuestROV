@@ -6,7 +6,7 @@ import time
 import json
 import threading
 import configManager
-import subprocess
+import requests
 
 # Before anything, we need to check the contents of configuration and make sure a config file exists. If it doesn't, copy the default
 configManager.initConfigJSON()
@@ -96,11 +96,17 @@ def backgroundThread():
                     print("screen changed to",parts[1])
 
                     displayString = "ip: waiting"
-
                     serialcmd = "$$screen=3=" + displayString.ljust(20) + "\r\n"
                     publishMessage("serial",serialcmd)
 
-                    address = str(subprocess.check_output(['hostname', '-I'])).split(' ')[0].replace("b'", "")
+                    # address = str(subprocess.check_output(['hostname', '-I'])).split(' ')[0].replace("b'", "")
+                    response = requests.get("http://host.docker.internal:9090/v1.0/ethernet")
+                    jdata = response.json()
+                    if(len(jdata) > 0):
+                        address = jdata[0]['addresses'][0]['ip']
+                        print(address)
+                    else:
+                        address = "no-devices"
                     
                     displayString = "ip: " + address
 
