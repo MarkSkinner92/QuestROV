@@ -6,6 +6,7 @@ import time
 import json
 import threading
 import configManager
+import subprocess
 
 # Before anything, we need to check the contents of configuration and make sure a config file exists. If it doesn't, copy the default
 configManager.initConfigJSON()
@@ -89,7 +90,36 @@ def backgroundThread():
 
         if(protocol == 'serial'):
             print("recieved serial data: " + message)
+            if(message[0] == "$"):
+                parts = message.split("=")
+                if(parts[0] == "$$SCREEN" and parts[1] == "3"):
+                    print("screen changed to",parts[1])
+
+                    displayString = "ip: waiting"
+
+                    serialcmd = "$$screen=3=" + displayString.ljust(20) + "\r\n"
+                    publishMessage("serial",serialcmd)
+
+                    address = str(subprocess.check_output(['hostname', '-I'])).split(' ')[0].replace("b'", "")
+                    
+                    displayString = "ip: " + address
+
+                    serialcmd = "$$screen=3=" + displayString.ljust(20) + "\r\n"
+                    publishMessage("serial",serialcmd)
+            # recieve screen 3
+            # send IP
+
+
+
+# def sendIPToScreen():
+#     while True:
+#         address = str(subprocess.check_output(['hostname', '-I'])).split(' ')[0].replace("b'", "")
+#         serialcmd = "$$screen=3=" + address + "\r\n"
+#         publishMessage("serial",serialcmd)
+#         print("published serial ip")
+#         time.sleep(5)
 
 if __name__ == '__main__':
+    # threading.Thread(target=sendIPToScreen, daemon=True).start()
     threading.Thread(target=backgroundThread, daemon=True).start()
     socketio.run(app, allow_unsafe_werkzeug=True, host="0.0.0.0", port=5000)

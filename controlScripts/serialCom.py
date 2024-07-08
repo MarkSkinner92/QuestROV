@@ -29,7 +29,7 @@ with open("configuration/config.json", "r") as configData:
 
 # Serial port configuration
 try:
-    ser = serial.Serial(configSettings.get('serialPort', '/dev/ttyACM0'), 115200) #/dev/ttyACM0 is the default, if config doesn't have it
+    ser = serial.Serial(configSettings.get('serialPort', '/dev/ttyAMA1'), 9600) #/dev/ttyAMA1 is the default, if config doesn't have it
 
     publisher.send_string("serial active")
     print("serial/out connected")
@@ -42,9 +42,13 @@ except serial.SerialException:
 def read_from_port(ser):
     while True:
         if ser.in_waiting > 0:
-            line = ser.readline().decode('utf-8').rstrip()
-            print("Received:", line)
-            publisher.send_string("serial/out " + line)
+            try:
+                line = ser.readline().decode('utf-8')
+                # line = ser.readline()
+                print("Received:", line)
+                publisher.send_string("serial/out " + line)
+            except:
+                print("error parsing")
 
 thread = threading.Thread(target=read_from_port, args=(ser,))
 thread.daemon = True
@@ -54,7 +58,9 @@ thread.start()
 while True:
     # Maybe there's a ZMQ message to send to serial?
     data = subscriber.recv_string()
-
-    print(f"Received value '{data}'")
+    parts = data.split(" ")
+    parts.pop(0)
+    data = " ".join(parts)
+    print(data)
+    print(f"Sending {data} out the serial port")
     ser.write(data.encode())
-    ser.write(b'\n')

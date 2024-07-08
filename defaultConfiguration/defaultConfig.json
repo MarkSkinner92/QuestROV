@@ -1,5 +1,5 @@
 {
-    "serialPort":"/dev/ttyACM0",
+    "serialPort":"/dev/ttyAMA1",
     "thrusters":{
         "directions" : [1,1,1,1,1,1]
     },

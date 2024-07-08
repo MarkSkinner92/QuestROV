@@ -1,10 +1,45 @@
-import serial
-import socketio, time
+import time
 import zmq
-import sys
-import json
 import signal
 import numpy as np
+
+import smbus
+import time
+
+bus = smbus.SMBus(1)
+
+class Motor:
+    def __init__(self, bus, address):
+        self.bus = bus
+        self.address = address
+        self.lastWriteTime = 0
+        self.lastWrittenSpeed = 0
+
+        self.upperSpeedLimit = 20
+        self.lowerSpeedLimit = -20
+
+        self.setSpeed(0)
+
+    def writeBus(self,speed):
+        
+        try:
+            requestedSpeed = max(self.lowerSpeedLimit, min(speed, self.upperSpeedLimit))
+            bus.write_word_data(self.address, 0, round(requestedSpeed))
+            self.lastWrittenSpeed = requestedSpeed
+        except OSError as e:
+            print(f"Error occurred: {e}")
+
+    def setSpeed(self, speed):
+        if(time.time() - self.lastWriteTime > 5):
+            self.writeBus(0)
+
+        # TODO: Do something to ramp if the requested speed is much different than self.lastWrittenSpeed
+
+        self.writeBus(speed)
+        self.lastWriteTime = time.time()
+
+# Register Motors
+motors = [Motor(bus, 0x2a),Motor(bus, 0x2b),Motor(bus, 0x2c),Motor(bus, 0x2d),Motor(bus, 0x2e),Motor(bus, 0x2f)]
     
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -14,6 +49,7 @@ context = zmq.Context()
 subscriber = context.socket(zmq.SUB)
 subscriber.connect("tcp://127.0.0.1:5555")
 subscriber.setsockopt_string(zmq.SUBSCRIBE, "man/")
+subscriber.setsockopt(zmq.RCVTIMEO, 1000)
 
 # To change the direction of a particular thruster, change this number
 thrusterDirection = np.array([1,1,1,1,1,1])
@@ -46,7 +82,8 @@ def computeThrustVector(inputVector):
 inputVector = np.matrix([[0.0],[0.0],[0.0]])
 
 while True:
-    stringData = subscriber.recv_string()
+    try:
+        stringData = subscriber.recv_string()
 
     data = stringData.split(' ',1)
     message = data[0]
@@ -64,4 +101,9 @@ while True:
     else:
         print(stringData)
 
-    print(message, value, " ===== " , computeThrustVector(inputVector))
+    thrustVector = computeThrustVector(inputVector)
+    for i, value in enumerate(thrustVector):
+        # motors[i].setSpeed(value*20)
+        print(i,value)
+
+    # print(computeThrustVector(inputVector))
