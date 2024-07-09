@@ -4,6 +4,7 @@ import signal
 import json
 import smbus
 import time
+import pca9554
 
 bus = smbus.SMBus(1)
 
@@ -14,8 +15,8 @@ class Motor:
         self.lastWriteTime = 0
         self.lastWrittenSpeed = 0
 
-        self.upperSpeedLimit = 20
-        self.lowerSpeedLimit = -20
+        self.upperSpeedLimit = 32000
+        self.lowerSpeedLimit = -32000
 
         self.setSpeed(0)
 
@@ -50,44 +51,62 @@ subscriber.setsockopt_string(zmq.SUBSCRIBE, "man/")
 try:
     with open('configuration/config.json') as configFile:
         configJson = json.load(configFile)
-        print("Thruster direction pulled from Config File")
+        print("Config File Loaded")
 except:
     print("couldn't open config file, or thrusters : directions [] doesn't exist")
 
+def thrustersOn():
+    i2c_address = 0x38
+    pca_driver = pca9554.Pca9554(i2c_address)
+    # enable all as be outputs and set low
+    for i in range(0, 8):
+        pca_driver.write_config_port(i, pca9554.OUTPUT)
+        pca_driver.write_port(i,1)
+
 # put our raw axis inputs through this function to ensure the output is actually 0 when the joystick is released.
-radius = 0.06
-def deadZone(value, radius):
-    if(-radius < value < radius):
+def deadZone(value, distance):
+    if(-distance < value < distance):
         return(0)
     return(value)
 
+print("Turning thrusters on...")
+thrustersOn()
+time.sleep(1)
+print("Thrusters On")
+
+addresses = configJson['thrusters']['addresses']
+mixerMatrix = configJson['thrusters']['mixer']
+gain = configJson['thrusters']['gain']
+constraints = configJson['thrusters']['constraints']
+deadZoneDistance = configJson['deadZone']
 
 # Set up motors from addresses
-addresses = configJson['thrusters']['addresses']
 motors = {}
 for motorName in addresses:
     motors[motorName] = Motor(bus, int(addresses[motorName], 16))
 
-
-mixerMatrix = configJson['thrusters']['mixer']
-for direciton in mixerMatrix:
-    print(direciton)
-
-
 def mixInputs(inputs):
     output = {}
+
+    # Compute the mixing of all directions
     for direction in inputs:
         inputValue = inputs[direction]
         contributions = mixerMatrix[direction]
         for thruster in contributions:
             weightedContribution = contributions[thruster] * inputValue
-            print("wc",thruster,weightedContribution)
             if(output.get(thruster,False)):
                 output[thruster] += weightedContribution
             else:
                 output[thruster] = weightedContribution
 
-        # print("direction",direction, "raw value",inputs[direction],mixerMatrix[direction])
+    
+    # Clip the raw outputs to keep them in range, and apply gain
+    # for thruster in output:
+    for thruster in output:
+        output[thruster] *= gain[thruster]
+        
+        output[thruster] = max(constraints["min"][thruster], min(output[thruster], constraints["max"][thruster]))
+
     return output
 
 
@@ -101,6 +120,7 @@ def mixInputs(inputs):
 
 # thrustVector = np.array([0,0,0,0,0,0])
 inputs = {}
+cleanOutputs = {}
 
 while True:
     stringData = subscriber.recv_string()
@@ -113,6 +133,7 @@ while True:
 
     if(message != "man/keepalive"):
         value = float(data[1])
+        value = deadZone(value, deadZoneDistance)
 
         if(message == 'man/forward'):
             if(value >= 0):
@@ -144,25 +165,10 @@ while True:
             if(value <= 0):
                 inputs["rollLeft"] = abs(value)
 
-        print(mixInputs(inputs))
+        cleanOutputs = mixInputs(inputs)
 
-        # if(message == 'man/forward'):
-        #     if(value >= 0):
-        #         inputs["forward"] = value
-        #     if(value <= 0):
-        #         inputs["backwards"] = value
-
-        # else:
-            # print(stringData)
-        
-#         # thrustVector = computeThrustVector(inputVector)
-
-#     else: # If message is a man/keepalive
-#         print("keep alive")
+    else: # If message is a man/keepalive
+        print("keep alive")
     
-
-#     for i, value in enumerate(thrustVector):
-#         motors[i].setSpeed(value*20)
-#         print(i,value)
-
-    # print(computeThrustVector(inputVector))
+    for thruster in cleanOutputs:
+        motors[thruster].setSpeed(cleanOutputs[thruster])
