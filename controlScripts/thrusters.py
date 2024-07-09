@@ -49,7 +49,6 @@ context = zmq.Context()
 subscriber = context.socket(zmq.SUB)
 subscriber.connect("tcp://127.0.0.1:5555")
 subscriber.setsockopt_string(zmq.SUBSCRIBE, "man/")
-subscriber.setsockopt(zmq.RCVTIMEO, 1000)
 
 # To change the direction of a particular thruster, change this number
 thrusterDirection = np.array([1,1,1,1,1,1])
@@ -80,28 +79,36 @@ def computeThrustVector(inputVector):
     return thrusterSpeeds
 
 inputVector = np.matrix([[0.0],[0.0],[0.0]])
+thrustVector = np.array([0,0,0,0,0,0])
 
 while True:
-    try:
-        stringData = subscriber.recv_string()
+    stringData = subscriber.recv_string()
 
     data = stringData.split(' ',1)
     message = data[0]
-    value = float(data[1])
 
-    if(message == 'man/forward'):
-        inputVector[0,0] = deadZone(value, radius)
 
-    elif(message == 'man/rightTurn'):
-        inputVector[1,0] = deadZone(value, radius)
+    if(message != "man/keepalive"):
+        value = float(data[1])
 
-    elif(message == 'man/up'):
-        inputVector[2,0] = deadZone(value, radius)
+        if(message == 'man/forward'):
+            inputVector[0,0] = deadZone(value, radius)
 
-    else:
-        print(stringData)
+        elif(message == 'man/rightTurn'):
+            inputVector[1,0] = deadZone(value, radius)
 
-    thrustVector = computeThrustVector(inputVector)
+        elif(message == 'man/up'):
+            inputVector[2,0] = deadZone(value, radius)
+
+        else:
+            print(stringData)
+        
+        thrustVector = computeThrustVector(inputVector)
+
+    else: # If message is a man/keepalive
+        print("keep alive")
+    
+
     for i, value in enumerate(thrustVector):
         # motors[i].setSpeed(value*20)
         print(i,value)

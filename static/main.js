@@ -53,6 +53,15 @@ function sendControl(name,value){
   socket.emit("man",name,value);
 }
 
+function sendKeepAlive(){
+  socket.emit("man","keepalive","ok");
+}
+
+// Send a keep alive every 4 seconds
+setInterval(() => {
+  sendKeepAlive();
+}, 4000)
+
 function checkGamepadSupport() {
   return 'getGamepads' in navigator;
 }

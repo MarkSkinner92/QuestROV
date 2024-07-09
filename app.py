@@ -118,16 +118,6 @@ def backgroundThread():
             # recieve screen 3
             # send IP
 
-
-
-# def sendIPToScreen():
-#     while True:
-#         address = str(subprocess.check_output(['hostname', '-I'])).split(' ')[0].replace("b'", "")
-#         serialcmd = "$$screen=3=" + address + "\r\n"
-#         publishMessage("serial",serialcmd)
-#         print("published serial ip")
-#         time.sleep(5)
-
 if __name__ == '__main__':
     # threading.Thread(target=sendIPToScreen, daemon=True).start()
     threading.Thread(target=backgroundThread, daemon=True).start()
