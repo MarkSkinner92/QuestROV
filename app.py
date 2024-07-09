@@ -100,13 +100,16 @@ def backgroundThread():
                     publishMessage("serial",serialcmd)
 
                     # address = str(subprocess.check_output(['hostname', '-I'])).split(' ')[0].replace("b'", "")
-                    response = requests.get("http://host.docker.internal:9090/v1.0/ethernet")
-                    jdata = response.json()
-                    if(len(jdata) > 0):
-                        address = jdata[0]['addresses'][0]['ip']
-                        print(address)
-                    else:
-                        address = "no-devices"
+                    try:
+                        response = requests.get("http://host.docker.internal:9090/v1.0/ethernet")
+                        jdata = response.json()
+                        if(len(jdata) > 0):
+                            address = jdata[0]['addresses'][0]['ip']
+                            print(address)
+                        else:
+                            address = "no-devices"
+                    except:
+                        address = "Get Req Fail"
                     
                     displayString = "ip: " + address
 

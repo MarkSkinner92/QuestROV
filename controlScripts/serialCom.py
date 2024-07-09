@@ -9,6 +9,15 @@ import threading
 # Ensures the program gets shut down and doesn't hang on waiting for serial data
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
+print("allow time for zmq to connect")
+time.sleep(2)
+
+# Get config settings
+configSettings = {}
+with open("configuration/config.json", "r") as configData:
+    # Load the JSON data
+    configSettings = json.load(configData)
+
 context = zmq.Context()
 
 subscriber = context.socket(zmq.SUB)
@@ -18,14 +27,7 @@ subscriber.setsockopt_string(zmq.SUBSCRIBE, "serial")
 publisher = context.socket(zmq.PUB)
 publisher.connect("tcp://127.0.0.1:5556")
 
-print("allow time for zmq to connect")
-time.sleep(1)
-
-# Get config settings
-configSettings = {}
-with open("configuration/config.json", "r") as configData:
-    # Load the JSON data
-    configSettings = json.load(configData)
+time.sleep(2)
 
 # Serial port configuration
 try:
@@ -33,6 +35,7 @@ try:
 
     publisher.send_string("serial active")
     print("serial/out connected")
+    ser.write("$$screen=3=Serial Connected\r\n".encode())
 
 except serial.SerialException:
     publisher.send_string("serial failedToConnect")
