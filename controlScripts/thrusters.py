@@ -132,8 +132,15 @@ while True:
 
 
     if(message != "man/keepalive"):
+        parts = message.split('_')
+
         value = float(data[1])
         value = deadZone(value, deadZoneDistance)
+
+        print(parts)
+        if(len(parts) > 0):
+            if(parts[0] == "man/test"):
+                motors[parts[1]].setSpeed(value)
 
         if(message == 'man/forward'):
             if(value >= 0):
