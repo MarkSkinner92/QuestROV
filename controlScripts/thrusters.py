@@ -1,8 +1,7 @@
 import time
 import zmq
 import signal
-import numpy as np
-
+import json
 import smbus
 import time
 
@@ -38,9 +37,6 @@ class Motor:
         self.writeBus(speed)
         self.lastWriteTime = time.time()
 
-# Register Motors
-motors = [Motor(bus, 0x2a),Motor(bus, 0x2b),Motor(bus, 0x2c),Motor(bus, 0x2d),Motor(bus, 0x2e),Motor(bus, 0x2f)]
-    
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 context = zmq.Context()
@@ -50,20 +46,13 @@ subscriber = context.socket(zmq.SUB)
 subscriber.connect("tcp://127.0.0.1:5555")
 subscriber.setsockopt_string(zmq.SUBSCRIBE, "man/")
 
-# To change the direction of a particular thruster, change this number
-thrusterDirection = np.array([1,1,1,1,1,1])
-
-# 6x3 transformation matrix
-# columns represent: forward, right-turn, up
-# rows 1-6 represent thrusters 1-6 in frame.png
-thrusterMatrix = np.matrix([
-    [1, -1,0],
-    [1, 1, 0],
-    [-1,-1,0],
-    [-1,1, 0],
-    [0, 0, 1],
-    [0, 0, 1]
-])
+# The config file will overwrite the directions of the thrusters defined above
+try:
+    with open('configuration/config.json') as configFile:
+        configJson = json.load(configFile)
+        print("Thruster direction pulled from Config File")
+except:
+    print("couldn't open config file, or thrusters : directions [] doesn't exist")
 
 # put our raw axis inputs through this function to ensure the output is actually 0 when the joystick is released.
 radius = 0.06
@@ -72,14 +61,46 @@ def deadZone(value, radius):
         return(0)
     return(value)
 
-# multiply our input vector by the transformation matrix, and keep each output in the bounds of [-1,1]
-def computeThrustVector(inputVector):
-    matrix = np.matmul(thrusterMatrix, inputVector).clip(-1,1)
-    thrusterSpeeds = np.squeeze(np.asarray(matrix)) * thrusterDirection
-    return thrusterSpeeds
 
-inputVector = np.matrix([[0.0],[0.0],[0.0]])
-thrustVector = np.array([0,0,0,0,0,0])
+# Set up motors from addresses
+addresses = configJson['thrusters']['addresses']
+motors = {}
+for motorName in addresses:
+    motors[motorName] = Motor(bus, int(addresses[motorName], 16))
+
+
+mixerMatrix = configJson['thrusters']['mixer']
+for direciton in mixerMatrix:
+    print(direciton)
+
+
+def mixInputs(inputs):
+    output = {}
+    for direction in inputs:
+        inputValue = inputs[direction]
+        contributions = mixerMatrix[direction]
+        for thruster in contributions:
+            weightedContribution = contributions[thruster] * inputValue
+            print("wc",thruster,weightedContribution)
+            if(output.get(thruster,False)):
+                output[thruster] += weightedContribution
+            else:
+                output[thruster] = weightedContribution
+
+        # print("direction",direction, "raw value",inputs[direction],mixerMatrix[direction])
+    return output
+
+
+
+
+
+
+# # multiply our input vector by the transformation matrix, and keep each output in the bounds of [-1,1]
+# def computeThrustVector(inputVector):
+#     return []
+
+# thrustVector = np.array([0,0,0,0,0,0])
+inputs = {}
 
 while True:
     stringData = subscriber.recv_string()
@@ -87,30 +108,61 @@ while True:
     data = stringData.split(' ',1)
     message = data[0]
 
+    print(message,data[0])
+
 
     if(message != "man/keepalive"):
         value = float(data[1])
 
         if(message == 'man/forward'):
-            inputVector[0,0] = deadZone(value, radius)
+            if(value >= 0):
+                inputs["forward"] = value
+            if(value <= 0):
+                inputs["backwards"] = abs(value)
 
-        elif(message == 'man/rightTurn'):
-            inputVector[1,0] = deadZone(value, radius)
+        if(message == 'man/right'):
+            if(value >= 0):
+                inputs["right"] = value
+            if(value <= 0):
+                inputs["left"] = abs(value)
 
-        elif(message == 'man/up'):
-            inputVector[2,0] = deadZone(value, radius)
+        if(message == 'man/up'):
+            if(value >= 0):
+                inputs["up"] = value
+            if(value <= 0):
+                inputs["down"] = abs(value)
 
-        else:
-            print(stringData)
+        if(message == 'man/yawRight'):
+            if(value >= 0):
+                inputs["yawRight"] = value
+            if(value <= 0):
+                inputs["yawLeft"] = abs(value)
+
+        if(message == 'man/rollRight'):
+            if(value >= 0):
+                inputs["rollRight"] = value
+            if(value <= 0):
+                inputs["rollLeft"] = abs(value)
+
+        print(mixInputs(inputs))
+
+        # if(message == 'man/forward'):
+        #     if(value >= 0):
+        #         inputs["forward"] = value
+        #     if(value <= 0):
+        #         inputs["backwards"] = value
+
+        # else:
+            # print(stringData)
         
-        thrustVector = computeThrustVector(inputVector)
+#         # thrustVector = computeThrustVector(inputVector)
 
-    else: # If message is a man/keepalive
-        print("keep alive")
+#     else: # If message is a man/keepalive
+#         print("keep alive")
     
 
-    for i, value in enumerate(thrustVector):
-        motors[i].setSpeed(value*20)
-        print(i,value)
+#     for i, value in enumerate(thrustVector):
+#         motors[i].setSpeed(value*20)
+#         print(i,value)
 
     # print(computeThrustVector(inputVector))
