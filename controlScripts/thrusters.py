@@ -110,7 +110,7 @@ while True:
     
 
     for i, value in enumerate(thrustVector):
-        # motors[i].setSpeed(value*20)
+        motors[i].setSpeed(value*20)
         print(i,value)
 
     # print(computeThrustVector(inputVector))
