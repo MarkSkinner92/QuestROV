@@ -1,13 +1,13 @@
 {
     "serialPort": "/dev/ttyAMA1",
     "deadZone": 0.1,
-    "cameraServo": {
-        "highPulse": 4,
-        "midPulse": 7,
-        "lowPulse": 10
+    "cameraServo":{
+        "highPulse":4,
+        "midPulse" : 7,
+        "lowPulse" : 10
     },
     "thrusters": {
-        "individualTestSpeed": 50,
+        "individualTestSpeed":50,
         "addresses": {
             "rightFront": "0x2a",
             "rightMid": "0x2e",
@@ -17,11 +17,11 @@
             "leftRear": "0x2d"
         },
         "gain": {
-            "rightFront": -300,
+            "rightFront": 300,
             "rightMid": 300,
             "rightRear": 300,
             "leftFront": 300,
-            "leftMid": -300,
+            "leftMid": 300,
             "leftRear": 300
         },
         "constraints": {
@@ -77,18 +77,18 @@
             },
             "down": {
                 "rightFront": 0,
-                "rightMid": -1,
-                "rightRear": 0,
-                "leftFront": 0,
-                "leftMid": -1,
-                "leftRear": 0
-            },
-            "up": {
-                "rightFront": 0,
                 "rightMid": 1,
                 "rightRear": 0,
                 "leftFront": 0,
                 "leftMid": 1,
+                "leftRear": 0
+            },
+            "up": {
+                "rightFront": 0,
+                "rightMid": -1,
+                "rightRear": 0,
+                "leftFront": 0,
+                "leftMid": -1,
                 "leftRear": 0
             },
             "yawRight": {

@@ -17,12 +17,12 @@
             "leftRear": "0x2d"
         },
         "gain": {
-            "rightFront": 20,
-            "rightMid": 20,
-            "rightRear": 20,
-            "leftFront": 20,
-            "leftMid": -20,
-            "leftRear": 20
+            "rightFront": 300,
+            "rightMid": 300,
+            "rightRear": 300,
+            "leftFront": 300,
+            "leftMid": 300,
+            "leftRear": 300
         },
         "constraints": {
             "max": {
@@ -77,18 +77,18 @@
             },
             "down": {
                 "rightFront": 0,
-                "rightMid": -1,
-                "rightRear": 0,
-                "leftFront": 0,
-                "leftMid": -1,
-                "leftRear": 0
-            },
-            "up": {
-                "rightFront": 0,
                 "rightMid": 1,
                 "rightRear": 0,
                 "leftFront": 0,
                 "leftMid": 1,
+                "leftRear": 0
+            },
+            "up": {
+                "rightFront": 0,
+                "rightMid": -1,
+                "rightRear": 0,
+                "leftFront": 0,
+                "leftMid": -1,
                 "leftRear": 0
             },
             "yawRight": {

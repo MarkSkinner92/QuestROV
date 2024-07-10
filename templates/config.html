@@ -11,7 +11,7 @@
 </head>
 <body>
     <div id="toolbar" style="padding:10px">
-        <p>Version 3.7-tdf</p>
+        <p>Version 3.7-am</p>
         <button onclick="pullDefaultConfig()">Pull Factory Default</button>
         <button onclick="mergeDefaultConfig()">Merge Factory Default w/ current</button>
         <button onclick="pullConfigSettingsFromROV()">Pull from ROV</button>
@@ -125,7 +125,20 @@
                     console.log("got this: ", factoryJSON);
                     console.log("If the above is not proper JSON, that will be an issue")
                     let previousJSONinEditor = editor.get();
-                    let merged = Object.assign(factoryJSON, previousJSONinEditor);
+
+                    let o1 = factoryJSON;
+                    let o2 = previousJSONinEditor;
+
+                    var merged = {};
+                    Object.keys(o2).forEach(key => {
+                        if (o2[key] instanceof Object) {
+                            merged[key] = Object.assign({}, o1[key], o2[key]);
+                        } else {
+                            merged[key] = o2[key];
+                        }
+                    });
+
+
                     editor.set(merged);
                     setStatusText("Done merging")
                 
