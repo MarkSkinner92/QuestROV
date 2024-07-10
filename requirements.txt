@@ -20,6 +20,5 @@ requests==2.25.1
 #simple-websocket==1.0.0
 #Werkzeug==3.0.2
 #wsproto==1.2.0
-numpy==1.19.5
 smbus==1.1.post2
-# RPi.GPIO==0.7.0
+RPi.GPIO==0.7.1
