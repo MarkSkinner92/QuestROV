@@ -11,8 +11,9 @@
 </head>
 <body>
     <div id="toolbar" style="padding:10px">
-        <p>Extension Updated: J9 7:22pm</p>
+        <p>Version 3.7</p>
         <button onclick="pullDefaultConfig()">Pull Factory Default</button>
+        <button onclick="mergeDefaultConfig()">Merge Factory Default w/ current</button>
         <button onclick="pullConfigSettingsFromROV()">Pull from ROV</button>
         <button onclick="uploadConfigSettings()">Save to ROV</button>
         <p style="display:inline">Status: <span id="statusText">Pulled config settings from ROV</span></p>
@@ -114,6 +115,26 @@
             req.responseType = "json";
             req.send();
             setStatusText("Pulling defaultConfig.json from ROV...")
+        }
+        function mergeDefaultConfig(){
+            const req = new XMLHttpRequest();
+
+            req.onload = (e) => {
+                
+                    let factoryJSON = req.response;
+                    console.log("got this: ", factoryJSON);
+                    console.log("If the above is not proper JSON, that will be an issue")
+                    let previousJSONinEditor = editor.get();
+                    let merged = Object.assign(factoryJSON, previousJSONinEditor);
+                    editor.set(merged);
+                    setStatusText("Done merging")
+                
+            /* … */
+            };
+            req.open("GET", "/default_config_data");
+            req.responseType = "json";
+            req.send();
+            setStatusText("Merging defaultConfig.json from ROV...")
         }
 
 
