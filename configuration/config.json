@@ -15,7 +15,7 @@
             "rightMid": 20,
             "rightRear": 20,
             "leftFront": 20,
-            "leftMid": 20,
+            "leftMid": -20,
             "leftRear": 20
         },
         "constraints": {
@@ -119,6 +119,24 @@
             }
         }
     },
+    "gripper": {
+        "claw": {
+            "channel": 0,
+            "initialAngle": 90,
+            "minAngle": 0,
+            "maxAngle": 180,
+            "minPulse": 600,
+            "maxPulse": 2400
+        },
+        "wrist": {
+            "channel": 0,
+            "initialAngle": 90,
+            "minAngle": 0,
+            "maxAngle": 180,
+            "minPulse": 600,
+            "maxPulse": 2400
+        }
+    },
     "inputMapping": {
         "forward": {
             "axis": 1,
@@ -159,6 +177,22 @@
             "buttonNegative": 6,
             "keyPositive": "e",
             "keyNegative": "q"
+        },
+        "gripperClaw": {
+            "axis": null,
+            "axisMultiplier": 0,
+            "buttonPositive": 3,
+            "buttonNegative": 0,
+            "keyPositive": null,
+            "keyNegative": null
+        },
+        "gripperWrist": {
+            "axis": null,
+            "axisMultiplier": 0,
+            "buttonPositive": 1,
+            "buttonNegative": 2,
+            "keyPositive": null,
+            "keyNegative": null
         }
     }
 }

@@ -55,6 +55,7 @@ try:
 except:
     print("couldn't open config file, or thrusters : directions [] doesn't exist")
 
+# This also turns on the fan
 def thrustersOn():
     i2c_address = 0x38
     pca_driver = pca9554.Pca9554(i2c_address)
@@ -140,7 +141,8 @@ while True:
         print(parts)
         if(len(parts) > 0):
             if(parts[0] == "man/test"):
-                motors[parts[1]].setSpeed(value)
+                thruster = parts[1]
+                motors[thruster].setSpeed(value * (1 if gain[thruster] > 0 else -1))
 
         if(message == 'man/forward'):
             if(value >= 0):

@@ -22,3 +22,4 @@ requests==2.25.1
 #wsproto==1.2.0
 numpy==1.19.5
 smbus==1.1.post2
+# RPi.GPIO==0.7.0
