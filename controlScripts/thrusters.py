@@ -113,6 +113,7 @@ mixerMatrix = configJson['thrusters']['mixer']
 gain = configJson['thrusters']['gain']
 constraints = configJson['thrusters']['constraints']
 deadZoneDistance = configJson['deadZone']
+testSpeed = configJson['thrusters'].get('individualTestSpeed',20)
 
 # Set up motors from addresses
 motors = {}
@@ -175,7 +176,7 @@ while True:
         if(len(parts) > 0):
             if(parts[0] == "man/test"):
                 thruster = parts[1]
-                motors[thruster].setSpeed(value * (1 if gain[thruster] > 0 else -1))
+                motors[thruster].setSpeed( (testSpeed if value > 0 else 0) * (-1 if gain[thruster] < 0 else 1))
 
         if(message == 'man/forward'):
             if(value >= 0):
