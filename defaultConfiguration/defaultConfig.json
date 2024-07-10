@@ -1,6 +1,11 @@
 {
     "serialPort": "/dev/ttyAMA1",
     "deadZone": 0.1,
+    "cameraServo":{
+        "highPulse":4,
+        "midPulse" : 7,
+        "lowPulse" : 10
+    },
     "thrusters": {
         "addresses": {
             "rightFront": "0x2a",
@@ -15,7 +20,7 @@
             "rightMid": 20,
             "rightRear": 20,
             "leftFront": 20,
-            "leftMid": 20,
+            "leftMid": -20,
             "leftRear": 20
         },
         "constraints": {
@@ -119,22 +124,22 @@
             }
         }
     },
-    "gripper":{
-        "claw":{
-            "channel":0,
-            "initialAngle":90,
-            "minAngle":0,
-            "maxAngle":180,
-            "minPulse":600,
-            "maxPulse":2400
+    "gripper": {
+        "claw": {
+            "channel": 0,
+            "initialAngle": 90,
+            "minAngle": 0,
+            "maxAngle": 180,
+            "minPulse": 600,
+            "maxPulse": 2400
         },
-        "wrist":{
-            "channel":0,
-            "initialAngle":90,
-            "minAngle":0,
-            "maxAngle":180,
-            "minPulse":600,
-            "maxPulse":2400
+        "wrist": {
+            "channel": 0,
+            "initialAngle": 90,
+            "minAngle": 0,
+            "maxAngle": 180,
+            "minPulse": 600,
+            "maxPulse": 2400
         }
     },
     "inputMapping": {
@@ -193,6 +198,14 @@
             "buttonNegative": 2,
             "keyPositive": null,
             "keyNegative": null
+        },
+        "moveCamera": {
+            "axis": null,
+            "axisMultiplier": null,
+            "buttonPositive": null,
+            "buttonNegative": null,
+            "keyPositive": "u",
+            "keyNegative": "j"
         }
     }
 }

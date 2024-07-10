@@ -1,6 +1,11 @@
 {
     "serialPort": "/dev/ttyAMA1",
     "deadZone": 0.1,
+    "cameraServo":{
+        "highPulse":5,
+        "midPulse" : 7,
+        "lowPulse" : 9
+    },
     "thrusters": {
         "addresses": {
             "rightFront": "0x2a",
@@ -193,6 +198,14 @@
             "buttonNegative": 2,
             "keyPositive": null,
             "keyNegative": null
+        },
+        "moveCamera": {
+            "axis": null,
+            "axisMultiplier": null,
+            "buttonPositive": null,
+            "buttonNegative": null,
+            "keyPositive": "u",
+            "keyNegative": "j"
         }
     }
 }

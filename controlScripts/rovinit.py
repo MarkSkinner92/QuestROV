@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import time
 
 pin_expEN = 25
 pin_FAN = 26
@@ -13,4 +14,5 @@ GPIO.output(pin_expEN, GPIO.HIGH)
 print("Starting pi cooling fan")
 GPIO.output(pin_FAN, GPIO.HIGH)
 
-print("done")
+print("done. Sleeping for a 60s")
+time.sleep(60)

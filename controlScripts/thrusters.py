@@ -5,6 +5,7 @@ import json
 import smbus
 import time
 import pca9554
+import math
 
 bus = smbus.SMBus(1)
 
@@ -14,6 +15,7 @@ class Motor:
         self.address = address
         self.lastWriteTime = 0
         self.lastWrittenSpeed = 0
+        self.lastTimeTempTaken = 0
 
         self.upperSpeedLimit = 32000
         self.lowerSpeedLimit = -32000
@@ -38,6 +40,13 @@ class Motor:
         self.writeBus(speed)
         self.lastWriteTime = time.time()
 
+    def getTemperature(self):
+        if(time.time() - self.lastTimeTempTaken > 1):
+            print("getting temperature on address:",self.address)
+            word = bus.read_word_data(self.address, 0x06)
+            print(word)
+            self.lastTimeTempTaken = time.time()
+
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 context = zmq.Context()
@@ -46,6 +55,30 @@ context = zmq.Context()
 subscriber = context.socket(zmq.SUB)
 subscriber.connect("tcp://127.0.0.1:5555")
 subscriber.setsockopt_string(zmq.SUBSCRIBE, "man/")
+
+# Publisher for sending temperature data
+publisher = context.socket(zmq.PUB)
+publisher.connect("tcp://127.0.0.1:5556")
+
+
+THERMISTORNOMINAL = 10000      # temp. for nominal resistance (almost always 25 C)
+TEMPERATURENOMINAL = 25        # Nominal temperature for the nominal resistance
+BCOEFFICIENT = 3900            # Beta coefficient of the thermistor (usually 3000-4000)
+SERIESRESISTOR = 10000          # Value of the series resistor
+
+def temperature(temp_raw):
+    # Calculate resistance from raw ADC value
+    resistance = SERIESRESISTOR / (65535 / float(temp_raw) - 1)
+
+    # Steinhart-Hart equation
+    steinhart = resistance / THERMISTORNOMINAL      # (R/Ro)
+    steinhart = math.log(steinhart)                 # ln(R/Ro)
+    steinhart /= BCOEFFICIENT                       # 1/B * ln(R/Ro)
+    steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15) # + (1/To)
+    steinhart = 1.0 / steinhart                     # Invert
+    steinhart -= 273.15                             # convert to C
+
+    return steinhart
 
 # The config file will overwrite the directions of the thrusters defined above
 try:
@@ -181,3 +214,4 @@ while True:
     
     for thruster in cleanOutputs:
         motors[thruster].setSpeed(cleanOutputs[thruster])
+        motors[thruster].getTemperature()
