@@ -27,7 +27,7 @@ run each python script individualy, or run `supervisord -n`  to start them all (
 `docker system prune` Deletes stopped/unused containers, frees up significant disk space
 
 **Build to Docker Hub**
-`docker build . -t markskinner92/QuestROV:latest --output type=registry` Replace destination with your own.
+`docker build . -t markskinner92/questrov:latest --output type=registry` Replace destination with your own.
 
 ------------
 
