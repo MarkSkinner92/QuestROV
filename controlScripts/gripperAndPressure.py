@@ -60,8 +60,10 @@ else:
 
 while True:
 	pressureSensor.read()
-	print(pressureSensor.depth(),pressureSensor.altitude())
-	publisher.send_string("web/leak 1")
+	# print(pressureSensor.depth(),pressureSensor.altitude())
+	stringData = "Depth: "+str(round(pressureSensor.depth(), 2))+"m\nAltitude: " + str(round(pressureSensor.altitude(), 2))+"m"
+	print(stringData)
+	publisher.send_string("web/pressure " + stringData)
 	time.sleep(2)
 # data = pressureSensor.read(ms5837.OSR_256)
 # print(data)

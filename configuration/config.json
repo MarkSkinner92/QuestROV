@@ -1,17 +1,12 @@
 {
     "serialPort": "/dev/ttyAMA1",
     "deadZone": 0.1,
-    "pressureSensor":{
-        "useSaltwater" : 0,
-        "useModel_30BA" : 1
-    },
-    "cameraServo":{
-        "highPulse":4,
-        "midPulse" : 7,
-        "lowPulse" : 10
+    "cameraServo": {
+        "highPulse": 4,
+        "midPulse": 7,
+        "lowPulse": 10
     },
     "thrusters": {
-        "individualTestSpeed":50,
         "addresses": {
             "rightFront": "0x2a",
             "rightMid": "0x2e",
@@ -21,7 +16,7 @@
             "leftRear": "0x2d"
         },
         "gain": {
-            "rightFront": 300,
+            "rightFront": 10,
             "rightMid": 300,
             "rightRear": 300,
             "leftFront": 300,

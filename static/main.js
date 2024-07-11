@@ -221,17 +221,26 @@ window.addEventListener("keyup", handleKeyUp);
 // TELEM
 let telem = [];
 
-registerTelem('telem');
+registerTelem('telem',0);
+registerTelem('pressure',1);
 
 
-function registerTelem(socketEventName){
-  let myIndex = telem.length;
+function registerTelem(socketEventName,index){
   socket.on(socketEventName, function(msg) {
-    telem[myIndex] = `${msg}`;
+    telem[index] = `${msg}`;
     refreshTelem();
   })
 }
 
 function refreshTelem(){
   document.getElementById("telem").innerText = telem.join('\n');
+}
+
+window.onfocus = () => {
+  console.log("got focus")
+  document.getElementById("focusBtn").style.display = "none";
+}
+window.onblur = () => {
+  console.log("lost focus")
+  document.getElementById("focusBtn").style.display = "block";
 }

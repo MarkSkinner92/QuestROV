@@ -120,12 +120,12 @@ def backgroundThread():
                 # parts = voltage current volt mincell volt maxcell temp charging
                 elif(parts[0] == "$$TELEM"):
                     telemString = ""
-                    telemString += "Voltage: " + parts[1] + '\n';
-                    telemString += "Current: " + parts[2] + '\n';
-                    telemString += "Mincell: " + parts[3] + '\n';
-                    telemString += "Maxcell: " + parts[4] + '\n';
-                    telemString += "Temperature: " + parts[5] + '\n';
-                    telemString += "charging: " + parts[6];
+                    telemString += "Voltage: " + parts[1] + '\n'
+                    telemString += "Current: " + parts[2] + '\n'
+                    telemString += "Mincell: " + parts[3] + '\n'
+                    telemString += "Maxcell: " + parts[4] + '\n'
+                    telemString += "Temperature: " + parts[5] + '\n'
+                    telemString += "charging: " + parts[6].strip()
 
                     print(telemString)
                     socketio.emit("telem", telemString)

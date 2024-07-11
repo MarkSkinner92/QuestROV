@@ -36,3 +36,11 @@ body{
     margin-top: 200px;
     display: none;
 }
+
+#focusBtn{
+    background-color: #fffa8e;
+    text-align: center;
+    width: 500px;
+    margin: 0 auto;
+    margin-top: 30px;
+}
