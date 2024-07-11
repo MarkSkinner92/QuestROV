@@ -26,6 +26,7 @@ class Motor:
         
         try:
             requestedSpeed = max(self.lowerSpeedLimit, min(speed, self.upperSpeedLimit))
+            print("wrote speed:")
             bus.write_word_data(self.address, 0, round(requestedSpeed))
             self.lastWrittenSpeed = requestedSpeed
         except OSError as e:

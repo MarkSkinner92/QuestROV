@@ -12,9 +12,16 @@
     <script type="text/javascript"> window.widgetImagePath = "{{ url_for('static', filename='jQuery-Flight-Indicators/img/') }}" </script>
 </head>
 <body>
-    <span id="attitude"></span>
-    <span id="heading"></span>
-    <p id="telem"></p>
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <div id="holderDiv">
+        <span id="attitude"></span>
+        <span id="heading"></span>
+        <p id="telem"></p>
+        <audio id="leakAudio" style="display:none">
+            <source src="{{ url_for('static', filename='leak.mp3') }}" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <h1 id="leakText">LEAK DETECTED</h1>
+        <script src="{{ url_for('static', filename='main.js') }}"></script>
+    </div>
 </body>
 </html>

@@ -1,7 +1,6 @@
 import serial
 import socketio, time
 import zmq
-import sys
 import json
 import signal
 import threading
@@ -32,15 +31,13 @@ time.sleep(2)
 # Serial port configuration
 try:
     ser = serial.Serial(configSettings.get('serialPort', '/dev/ttyAMA1'), 9600) #/dev/ttyAMA1 is the default, if config doesn't have it
-
-    publisher.send_string("serial active")
     print("serial/out connected")
     ser.write("$$screen=3=Serial Connected\r\n".encode())
 
 except serial.SerialException:
     publisher.send_string("serial failedToConnect")
     print("Failed to connect to serial port. Exiting...")
-    sys.exit(1)
+    ser.write("$$screen=3=Serial Can't Connect\r\n".encode())
 
 def read_from_port(ser):
     while True:

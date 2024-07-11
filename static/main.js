@@ -43,6 +43,24 @@ socket.on('imu', function(msg) {
     if(data?.heading) heading.setHeading(data.heading)
 });
 
+socket.on('leak', function(msg) {
+  detectLeak();
+  setTimeout(cancelLeak,2000)
+});
+
+function detectLeak(){
+  console.log("leak")
+  document.getElementById("holderDiv").style.background = "#FF000050";
+  document.getElementById("leakText").style.display = "block";
+  let audio = document.getElementById("leakAudio");
+  audio.currentTime = 0;
+  audio.play();
+}
+function cancelLeak(){
+  document.getElementById("holderDiv").style.background = "#FFFFFF00";
+  document.getElementById("leakText").style.display = "none";
+}
+
 //this interval sends a ping at a realitively high frequency
 //omitting this interval, or slowing it down to even 1hz makes the socket connection chopy and unreliable.
 setInterval(() => {

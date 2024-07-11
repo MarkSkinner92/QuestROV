@@ -1,6 +1,10 @@
 {
     "serialPort": "/dev/ttyAMA1",
     "deadZone": 0.1,
+    "pressureSensor":{
+        "useSaltwater" : 0,
+        "useModel_30BA" : 1
+    },
     "cameraServo":{
         "highPulse":4,
         "midPulse" : 7,

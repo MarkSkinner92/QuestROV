@@ -109,7 +109,7 @@ def backgroundThread():
                         else:
                             address = "no-devices"
                     except:
-                        address = "Get Req Fail"
+                        address = "None Found"
                     
                     displayString = "ip: " + address
 
