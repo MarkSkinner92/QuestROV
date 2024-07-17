@@ -235,10 +235,12 @@ function registerTelem(socketEventName,index){
 function refreshTelem(){
   document.getElementById("telem").innerText = telem.join('\n');
 }
-
-window.onfocus = () => {
-  console.log("got focus")
+function setInFocus(){
   document.getElementById("focusBtn").style.display = "none";
+}
+window.onfocus = () => {
+  console.log("got focus");
+  setInFocus()
 }
 window.onblur = () => {
   console.log("lost focus")

@@ -90,6 +90,7 @@ def backgroundThread():
 
         if(protocol == 'serial'):
             print("recieved serial data: " + message)
+            publishMessage("serial","alive")
             if(message[0] == "$"):
                 parts = message.split("=")
                 if(parts[0] == "$$SCREEN" and parts[1] == "3"):
