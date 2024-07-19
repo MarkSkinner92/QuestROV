@@ -12,10 +12,10 @@
 
 #telem{
     font-family: sans-serif;
-    position: absolute;
+    position: relative;
     left: 0px;
     top: 0px;
-    background: #ffffff4c;
+    width:fit-content;
     margin: 0px;
 }
 
@@ -29,6 +29,7 @@
 body{
     overflow:hidden;
     margin:0px;
+    font-family: sans-serif;
 }
 
 #leakText{
@@ -41,6 +42,19 @@ body{
     background-color: #fffa8e;
     text-align: center;
     width: 500px;
-    margin: 0 auto;
-    margin-top: 30px;
+    display: block;
+    margin: 0px;
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%);
+    top: 30px;
+}
+
+.ROVname{
+    margin:0px;
+}
+
+.topLeftPanel{
+    background-color: #FFFFFF4c;
+    width:fit-content;
 }

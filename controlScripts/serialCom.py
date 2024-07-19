@@ -56,7 +56,7 @@ def write_to_port(ser):
             parts = data.split(" ")
             parts.pop(0)
             data = " ".join(parts)
-            print(data)
+            # print(data)
             print(f"Sending {data} out the serial port")
             ser.write(data.encode())
 

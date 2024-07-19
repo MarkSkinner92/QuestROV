@@ -16,7 +16,11 @@
         <h1 id="focusBtn">Click for keyboard control</h1>
         <span id="attitude"></span>
         <span id="heading"></span>
-        <p id="telem"></p>
+        <div class='topLeftPanel'>
+            <h1 class='ROVname'>ROV 1</h1>
+            <p id="telem"></p>
+        </div>
+        
         <audio id="leakAudio" style="display:none">
             <source src="{{ url_for('static', filename='leak.mp3') }}" type="audio/mpeg">
             Your browser does not support the audio element.

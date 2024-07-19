@@ -1,6 +1,7 @@
 FROM balenalib/raspberry-pi-debian:latest
 
 WORKDIR /QuestROV
+ENV BLUEOS_ADDR="host.docker.internal"
 
 RUN apt-get update && apt-get install -y \
     python3 \
