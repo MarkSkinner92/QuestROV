@@ -14,6 +14,8 @@ import subprocess
 # Before anything, we need to check the contents of configuration and make sure a config file exists. If it doesn't, copy the default
 configManager.initConfigJSON()
 
+HOST = os.environ.get("BLUEOS_ADDR", "localhost")
+
 context = zmq.Context()
 
 # Create a ZeroMQ publisher
@@ -74,21 +76,24 @@ def handle_message(name, value):
     publishMessage("man/"+name,str(value))
     print(name, value)
 
+@socketio.on('connect')
+def connect():
+    print("CONNECTION!")
+    # Ask for name
+    try:
+        response = requests.get("http://"+HOST+":9111/v1.0/vehicle_name")
+        jdata = response.json()
+        socketio.emit("name", jdata)
+        print("setting name to",jdata)
+
+    except:
+        print("couldn't get vehicle name at start")
+    
+
 def backgroundThread():
 
-    # Ask for name
-    # try:
-    #     response = requests.get("http://host.docker.internal:9111/v1.0/vehicle_name")
-    #     jdata = response.json()
-    #     print(jdata)
-    # except:
-    #     try:
-    #         response = requests.get("http://localhost:9111/v1.0/vehicle_name")
-    #         jdata = response.json()
-    #     except:
-    #         address = "None Found"
-
     global socketio
+
     while True:
 
         data = subscriber.recv_string()
@@ -117,7 +122,7 @@ def backgroundThread():
                     publishMessage("serial",serialcmd)
 
                     try:
-                        response = requests.get("http://host.docker.internal:9090/v1.0/ethernet")
+                        response = requests.get("http://"+HOST+":9090/v1.0/ethernet")
                         jdata = response.json()
                         if(len(jdata) > 0):
                             address = jdata[0]['addresses'][0]['ip']
@@ -126,19 +131,6 @@ def backgroundThread():
                             address = "no-devices"
                     except:
                         address = "None Found"
-                        print("host.docker.internal didn't resolve, attempting localhost (if running as a docker extension, this won't work)")
-
-                        try:
-                            response = requests.get("http://localhost:9090/v1.0/ethernet")
-                            jdata = response.json()
-                            if(len(jdata) > 0):
-                                address = jdata[0]['addresses'][0]['ip']
-                                print(address)
-                            else:
-                                address = "no-devices"
-                        except:
-                            address = "None Found"
-
                     
                     displayString = "ip: " + address
 
@@ -167,6 +159,7 @@ def backgroundThread():
 
 if __name__ == '__main__':
     print("BlueOS Host Address set to:",os.environ.get("BLUEOS_ADDR", "localhost"))
-    # threading.Thread(target=sendIPToScreen, daemon=True).start()
+
     threading.Thread(target=backgroundThread, daemon=True).start()
+
     socketio.run(app, allow_unsafe_werkzeug=True, host="0.0.0.0", port=5000)

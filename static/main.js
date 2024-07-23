@@ -48,6 +48,11 @@ socket.on('leak', function(msg) {
   setTimeout(cancelLeak,2000)
 });
 
+socket.on('name', function(msg) {
+  console.log("got name",msg);
+  document.querySelector('.ROVname').innerText = msg;
+});
+
 function detectLeak(){
   console.log("leak")
   document.getElementById("holderDiv").style.background = "#FF000050";
