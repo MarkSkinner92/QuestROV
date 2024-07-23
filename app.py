@@ -158,6 +158,10 @@ def backgroundThread():
 
                     print(telemString)
                     socketio.emit("telem", telemString)
+
+                elif(parts[0] == "$$SHUTDOWN"):
+                    print("shutting down gracefully")
+                    os.system("shutdown /s /t 1")
             # recieve screen 3
             # send IP
 
