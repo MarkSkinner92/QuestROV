@@ -15,6 +15,7 @@ import subprocess
 configManager.initConfigJSON()
 
 HOST = os.environ.get("BLUEOS_ADDR", "localhost")
+activeConnections = 0
 
 context = zmq.Context()
 
@@ -27,16 +28,12 @@ subscriber = context.socket(zmq.SUB)
 subscriber.setsockopt_string(zmq.SUBSCRIBE, "")
 subscriber.bind("tcp://*:5556")
 
-# def publishJSON(topic,data):
-#     global publisher
-#     publisher.send_string(topic + " " + json.dumps(data))
-
 def publishMessage(topic,message):
     global publisher
     publisher.send_string(topic + " " + message)
 
 app = Flask(__name__, static_url_path="/static", static_folder="static")
-app.config['SECRET_KEY'] = 'secret!'
+
 socketio = SocketIO(app)
 
 @app.route('/console')
@@ -76,9 +73,25 @@ def handle_message(name, value):
     publishMessage("man/"+name,str(value))
     print(name, value)
 
+def updateBagOfConnections():
+    requests.post("http://"+HOST+":9101/v1.0/set/fleetManager/connections", json = activeConnections)
+
+@socketio.on('disconnect')
+def disconnect():
+    global activeConnections
+    print("DISCONENCTED!")
+    activeConnections -= 1
+
+    updateBagOfConnections()
+
 @socketio.on('connect')
 def connect():
+    global activeConnections
     print("CONNECTION!")
+    activeConnections += 1
+
+    updateBagOfConnections()
+
     # Ask for name
     try:
         response = requests.get("http://"+HOST+":9111/v1.0/vehicle_name")
@@ -88,7 +101,6 @@ def connect():
 
     except:
         print("couldn't get vehicle name at start")
-    
 
 def backgroundThread():
 
