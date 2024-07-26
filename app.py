@@ -17,6 +17,9 @@ configManager.initConfigJSON()
 HOST = os.environ.get("BLUEOS_ADDR", "localhost")
 activeConnections = 0
 
+# Clear out the fleet manager info in the Bag Editor
+requests.post("http://"+HOST+":9101/v1.0/set/fleetManager", json = {})
+
 context = zmq.Context()
 
 # Create a ZeroMQ publisher
@@ -64,9 +67,10 @@ def save_config():
             json.dump(data, file, indent=4)
     return 'success'
 
-# @app.route("/info",methods=['GET'])
-# def getInfo():
-#    return {"battery":"12.5v"}
+@app.route('/speedtest')
+def speedTest():
+    socketio.emit("speedTest")
+    return 'success'
 
 @socketio.on('man')
 def handle_message(name, value):
@@ -101,6 +105,16 @@ def connect():
 
     except:
         print("couldn't get vehicle name at start")
+
+@socketio.on('uploadSpeed')
+def setUploadSpeed(speed):
+    speedString = str(round(speed,1)) + " Mbps"
+    requests.post("http://"+HOST+":9101/v1.0/set/fleetManager/uploadSpeed", json = speedString)
+
+@socketio.on('downloadSpeed')
+def setDownloadSpeed(speed):
+    speedString = str(round(speed,1)) + " Mbps"
+    requests.post("http://"+HOST+":9101/v1.0/set/fleetManager/downloadSpeed", json = speedString)
 
 def backgroundThread():
 

@@ -53,6 +53,17 @@ socket.on('name', function(msg) {
   document.querySelector('.ROVname').innerText = msg;
 });
 
+socket.on('speedTest', function(){
+  console.log("Uploading 100 Mb from the ROV to this computer (as a network speed test)")
+  runFullSpeedTest();
+});
+
+function runFullSpeedTest(){
+  doDownloadTest().then(() => {
+    doUploadTest();
+  });
+}
+
 function detectLeak(){
   console.log("leak")
   document.getElementById("holderDiv").style.background = "#FF000050";
@@ -65,7 +76,6 @@ function cancelLeak(){
   document.getElementById("holderDiv").style.background = "#FFFFFF00";
   document.getElementById("leakText").style.display = "none";
 }
-
 //this interval sends a ping at a realitively high frequency
 //omitting this interval, or slowing it down to even 1hz makes the socket connection chopy and unreliable.
 setInterval(() => {
@@ -250,4 +260,67 @@ window.onfocus = () => {
 window.onblur = () => {
   console.log("lost focus")
   document.getElementById("focusBtn").style.display = "block";
+}
+
+function doUploadTest(){
+  let start_time;
+
+  axios({
+    method: 'post',
+    url: `http://${window.location.hostname}/network-test/post_file`,
+    timeout: 20000,
+    data: new ArrayBuffer(100 * 2 ** 20),
+    onUploadProgress: (progress_event) => {
+      if (start_time === undefined) {
+        start_time = new Date().getTime();
+        return;
+      }
+
+      const seconds = (new Date().getTime() - start_time) * 1e-3;
+      const speed_Mb = 8 * (progress_event.loaded / seconds / 2 ** 20);
+      const alpha_factor = 0.7;
+
+      // Update upload speed with exponential smoothing
+      let upload_speed = (this.upload_speed ?? 0) * (1 - alpha_factor) + alpha_factor * speed_Mb;
+
+      console.log("progress on upload speed test:", upload_speed, "Mbps");
+      socket.emit("uploadSpeed",upload_speed);
+    },
+  });
+
+}
+
+function doDownloadTest(){
+  return new Promise((resolve) => {
+    const one_hundred_mega_bytes = 100 * 2 ** 20;
+    let start_time;
+
+    axios({
+      method: 'get',
+      url: `http://${window.location.hostname}/network-test/get_file`,
+      timeout: 20000,
+      params: {
+        size: one_hundred_mega_bytes,
+        avoid_cache: new Date().getTime(),
+      },
+      onDownloadProgress: (progress_event) => {
+        if (start_time === undefined) {
+          start_time = new Date().getTime();
+          return;
+        }
+
+        const seconds = (new Date().getTime() - start_time) * 1e-3;
+        const speed_Mb = 8 * (progress_event.loaded / seconds / 2 ** 20);
+        const alpha_factor = 0.7;
+
+        // Update download speed with exponential smoothing
+        let download_speed = (this.download_speed ?? 0) * (1 - alpha_factor) + alpha_factor * speed_Mb;
+
+        console.log("progress on download speed test:", download_speed, "Mbps");
+        socket.emit("downloadSpeed",download_speed);
+      },
+    }).finally(() => {
+      resolve();
+    });
+  });
 }
