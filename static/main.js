@@ -264,11 +264,12 @@ window.onblur = () => {
 
 function doUploadTest(){
   let start_time;
+  let speeds = [];
 
   axios({
     method: 'post',
     url: `http://${window.location.hostname}/network-test/post_file`,
-    timeout: 20000,
+    timeout: 10000,
     data: new ArrayBuffer(100 * 2 ** 20),
     onUploadProgress: (progress_event) => {
       if (start_time === undefined) {
@@ -283,9 +284,20 @@ function doUploadTest(){
       // Update upload speed with exponential smoothing
       let upload_speed = (this.upload_speed ?? 0) * (1 - alpha_factor) + alpha_factor * speed_Mb;
 
-      console.log("progress on upload speed test:", upload_speed, "Mbps");
-      socket.emit("uploadSpeed",upload_speed);
+      console.log("progress on upload speed test:", speed_Mb, "Mbps");
+      speeds.push(speed_Mb)
     },
+  }).finally(()=>{
+    let avg = 0;
+    if(speeds.length > 0){
+      if(speeds.length == 1) avg = speeds[0];
+      if(speeds.length == 2) avg = (speeds[0] + speeds[1])/2;
+      if(speeds.length > 2){
+        avg = speeds[Math.floor(speeds.length/2)];
+      }
+    }
+    console.log("avg (median) upload Speed",avg);
+    socket.emit("uploadSpeed",avg);
   });
 
 }
@@ -294,7 +306,7 @@ function doDownloadTest(){
   return new Promise((resolve) => {
     const one_hundred_mega_bytes = 100 * 2 ** 20;
     let start_time;
-
+    let speeds = [];
     axios({
       method: 'get',
       url: `http://${window.location.hostname}/network-test/get_file`,
@@ -316,10 +328,20 @@ function doDownloadTest(){
         // Update download speed with exponential smoothing
         let download_speed = (this.download_speed ?? 0) * (1 - alpha_factor) + alpha_factor * speed_Mb;
 
-        console.log("progress on download speed test:", download_speed, "Mbps");
-        socket.emit("downloadSpeed",download_speed);
+        console.log("progress on download speed test:", speed_Mb, "Mbps");
+        speeds.push(speed_Mb)
       },
     }).finally(() => {
+      let avg = 0;
+      if(speeds.length > 0){
+        if(speeds.length == 1) avg = speeds[0];
+        if(speeds.length == 2) avg = (speeds[0] + speeds[1])/2;
+        if(speeds.length > 2){
+          avg = speeds[Math.floor(speeds.length/2)];
+        }
+      }
+      console.log("avg (median) download Speed",avg);
+      socket.emit("downloadSpeed",avg);
       resolve();
     });
   });
