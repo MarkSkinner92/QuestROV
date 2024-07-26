@@ -1,4 +1,8 @@
 let socket = io.connect('http://' + location.host);
+
+socket.on('connect',()=>{
+  socket.emit('newDriver')
+});
 /*
 
 This is the default input mapping responsible for taking key, button, and axis inputs and mapping them to certain ROV actions.

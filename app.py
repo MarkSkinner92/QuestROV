@@ -80,18 +80,25 @@ def handle_message(name, value):
 def updateBagOfConnections():
     requests.post("http://"+HOST+":9101/v1.0/set/fleetManager/connections", json = activeConnections)
 
+drivers = []
+
 @socketio.on('disconnect')
 def disconnect():
+    global drivers
     global activeConnections
     print("DISCONENCTED!")
-    activeConnections -= 1
+    if(request.sid in drivers):
+        print("Disconnecting Driver")
+        activeConnections -= 1
 
     updateBagOfConnections()
 
-@socketio.on('connect')
-def connect():
+@socketio.on('newDriver')
+def newDriver():
+    global drivers
     global activeConnections
-    print("CONNECTION!")
+    print("NEW DRIVER!", request.sid)
+    drivers.append(request.sid)
     activeConnections += 1
 
     updateBagOfConnections()
